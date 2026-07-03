@@ -1,0 +1,50 @@
+{
+  "A1B2C3D4": {
+    "name": "Fantasy",
+    "type": "story"
+  },
+  "B2C3D4E5": {
+    "name": "Mystery",
+    "type": "story"
+  },
+  "C3D4E5F6": {
+    "name": "Space",
+    "type": "story"
+  },
+  "D4E5F6A7": {
+    "name": "Sword",
+    "type": "action"
+  },
+  "E5F6A7B8": {
+    "name": "Magic",
+    "type": "action"
+  },
+  "F6A7B8C9": {
+    "name": "Shield",
+    "type": "action"
+  },
+  "A7B8C9D0": {
+    "name": "Run",
+    "type": "action"
+  },
+  "B8C9D0E1": {
+    "name": "Key",
+    "type": "item"
+  },
+  "C9D0E1F2": {
+    "name": "Talk",
+    "type": "action"
+  },
+  "D0E1F2A3": {
+    "name": "Hide",
+    "type": "action"
+  },
+  "E1F2A3B4": {
+    "name": "Open Door",
+    "type": "action"
+  },
+  "F2A3B4C5": {
+    "name": "Restart",
+    "type": "system"
+  }
+}

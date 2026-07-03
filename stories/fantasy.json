@@ -1,0 +1,187 @@
+{
+  "id": "fantasy",
+  "title": "Fantasy Quest",
+  "start_scene": "castle",
+  "scenes": {
+    "castle": {
+      "id": "castle",
+      "title": "Castle Gates",
+      "text": "You stand before the castle gates. A cold wind blows from the north. Three paths beckon.",
+      "image": "assets/images/fantasy/castle.png",
+      "choices": {
+        "Sword": "armory",
+        "Run": "forest",
+        "Magic": "tower"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false
+    },
+    "armory": {
+      "id": "armory",
+      "title": "Dusty Armory",
+      "text": "You enter the dusty armory and pick up a rusty sword. The dragon's lair lies ahead.",
+      "image": "assets/images/fantasy/armory.png",
+      "choices": {
+        "Sword": "dragon"
+      },
+      "required_items": [],
+      "gained_items": ["Sword"],
+      "lost_items": [],
+      "ending": false
+    },
+    "forest": {
+      "id": "forest",
+      "title": "Dark Forest",
+      "text": "You flee into the dark forest. Something watches from the shadows.",
+      "image": "assets/images/fantasy/forest.png",
+      "choices": {
+        "Hide": "caught",
+        "Talk": "hermit",
+        "Run": "escape"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false
+    },
+    "tower": {
+      "id": "tower",
+      "title": "Wizard's Tower",
+      "text": "A spiraling tower rises above the courtyard. A locked vault door glints below.",
+      "image": "assets/images/fantasy/tower.png",
+      "choices": {
+        "Open Door": "vault",
+        "Magic": "wizard",
+        "Run": "forest"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false
+    },
+    "wizard": {
+      "id": "wizard",
+      "title": "Tower Summit",
+      "text": "The wizard hands you a glowing shield. 'The dragon respects strength and defense alike.'",
+      "image": "assets/images/fantasy/wizard.png",
+      "choices": {
+        "Shield": "dragon",
+        "Run": "forest"
+      },
+      "required_items": [],
+      "gained_items": ["Shield"],
+      "lost_items": [],
+      "ending": false
+    },
+    "hermit": {
+      "id": "hermit",
+      "title": "Forest Hermit",
+      "text": "A hermit emerges from the moss. 'Take this key — the throne room holds the real treasure.'",
+      "image": "assets/images/fantasy/hermit.png",
+      "choices": {
+        "Open Door": "gate",
+        "Run": "forest"
+      },
+      "required_items": [],
+      "gained_items": ["Key"],
+      "lost_items": [],
+      "ending": false
+    },
+    "gate": {
+      "id": "gate",
+      "title": "Inner Gate",
+      "text": "A heavy iron gate blocks the throne room. Your key should fit the lock.",
+      "image": "assets/images/fantasy/gate.png",
+      "choices": {
+        "Open Door": "throne"
+      },
+      "required_items": ["Key"],
+      "gained_items": [],
+      "lost_items": ["Key"],
+      "ending": false
+    },
+    "vault": {
+      "id": "vault",
+      "title": "Secret Vault",
+      "text": "The vault opens! Ancient gold spills across the floor.",
+      "image": "assets/images/fantasy/vault.png",
+      "choices": {},
+      "required_items": ["Key"],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": "treasure"
+    },
+    "dragon": {
+      "id": "dragon",
+      "title": "Dragon's Lair",
+      "text": "A dragon blocks the path! You need a weapon — or a shield — to survive.",
+      "image": "assets/images/fantasy/dragon.png",
+      "choices": {
+        "Sword": "victory",
+        "Shield": "standoff",
+        "Run": "escape"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false
+    },
+    "throne": {
+      "id": "throne",
+      "title": "Throne Room",
+      "text": "You claim the crown and restore peace to the kingdom!",
+      "image": "assets/images/fantasy/throne.png",
+      "choices": {},
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": "good"
+    },
+    "victory": {
+      "id": "victory",
+      "title": "Dragon Slain",
+      "text": "You slay the dragon and claim its hoard!",
+      "image": "assets/images/fantasy/victory.png",
+      "choices": {},
+      "required_items": ["Sword"],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": "good"
+    },
+    "standoff": {
+      "id": "standoff",
+      "title": "Stalemate",
+      "text": "The dragon respects your shield. It lets you pass, but the treasure stays behind.",
+      "image": "assets/images/fantasy/standoff.png",
+      "choices": {},
+      "required_items": ["Shield"],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": "neutral"
+    },
+    "escape": {
+      "id": "escape",
+      "title": "Narrow Escape",
+      "text": "You escape, but the quest remains unfinished.",
+      "image": "assets/images/fantasy/escape.png",
+      "choices": {},
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": "bad"
+    },
+    "caught": {
+      "id": "caught",
+      "title": "Ambushed",
+      "text": "Bandits find you hiding. Your adventure ends in chains.",
+      "image": "assets/images/fantasy/caught.png",
+      "choices": {},
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": "bad"
+    }
+  }
+}
