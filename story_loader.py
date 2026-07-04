@@ -1,4 +1,4 @@
-"""Story JSON ingestion for the Tangible NFC Story Game.
+"""Story JSON ingestion for the Tangible NFC Interactive Storybook.
 
 Loads and validates branching story files from ``stories/`` and exposes
 immutable domain objects (:class:`Story`, :class:`Scene`).
@@ -7,9 +7,12 @@ immutable domain objects (:class:`Story`, :class:`Scene`).
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+import logging
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 class StoryLoadError(Exception):
@@ -29,6 +32,7 @@ class Scene:
     image: str
     choices: dict[str, str]
     title: str = ""
+    choice_labels: dict[str, str] = field(default_factory=dict)
     required_items: tuple[str, ...] = ()
     gained_items: tuple[str, ...] = ()
     lost_items: tuple[str, ...] = ()
@@ -92,7 +96,7 @@ class StoryLoader:
     def load_story(self, name_or_path: str | Path) -> Story:
         """Load a story by ID, filename, or absolute/relative path.
 
-        Accepts ``"fantasy"``, ``"fantasy.json"``, or a full path to a JSON file.
+        Accepts ``"benny"``, ``"benny.json"``, or a full path to a JSON file.
         Results are cached by story ID.
 
         Args:
@@ -133,7 +137,10 @@ class StoryLoader:
 
         stories: dict[str, Story] = {}
         for path in sorted(self._stories_dir.glob("*.json")):
-            story = self.load_story(path)
+            try:
+                story = self.load_story(path)
+            except StoryLoadError:
+                continue
             stories[story.id] = story
         return stories
 
@@ -184,6 +191,21 @@ class StoryLoader:
             except StoryLoadError:
                 story_ids.append(path.stem)
         return story_ids
+
+    def list_story_titles(self) -> list[str]:
+        """Return display titles for every loadable ``*.json`` story in the directory.
+
+        Titles come from each file's ``title`` field. Files that fail to load are
+        skipped. Results are sorted alphabetically by title.
+        """
+        titles: list[str] = []
+        for story_id in self.list_available_stories():
+            try:
+                story = self.load_story(story_id)
+            except StoryLoadError:
+                continue
+            titles.append(story.title)
+        return sorted(titles)
 
     def clear_cache(self) -> None:
         """Remove all cached stories."""
@@ -244,13 +266,10 @@ class StoryLoader:
         start_scene = self._require_non_empty_str(data, "start_scene", source)
 
         raw_scenes = data.get("scenes")
-        if not isinstance(raw_scenes, dict) or not raw_scenes:
-            raise StoryValidationError(
-                f"Story {source}: 'scenes' must be a non-empty object"
-            )
+        scenes_dict = self._normalize_scenes(raw_scenes, source)
 
         scenes: dict[str, Scene] = {}
-        for scene_key, scene_data in raw_scenes.items():
+        for scene_key, scene_data in scenes_dict.items():
             if not isinstance(scene_data, dict):
                 raise StoryValidationError(
                     f"Story {source}: scene {scene_key!r} must be an object"
@@ -312,6 +331,13 @@ class StoryLoader:
                 )
             choices[action_name.strip()] = next_scene.strip()
 
+        choice_labels = self._parse_choice_labels(
+            data.get("choice_labels"),
+            source=source,
+            scene_id=scene_id,
+            choices=choices,
+        )
+
         required_items = self._parse_string_list(
             data.get("required_items"), source, scene_id, "required_items"
         )
@@ -329,10 +355,53 @@ class StoryLoader:
             image=image,
             choices=choices,
             title=title,
+            choice_labels=choice_labels,
             required_items=tuple(required_items),
             gained_items=tuple(gained_items),
             lost_items=tuple(lost_items),
             ending=ending,
+        )
+
+    def _normalize_scenes(
+        self,
+        raw_scenes: Any,
+        source: Path,
+    ) -> dict[str, dict[str, Any]]:
+        """Convert scenes from list or dict format into a dict keyed by scene id."""
+        if isinstance(raw_scenes, list):
+            if not raw_scenes:
+                raise StoryValidationError(
+                    f"Story {source}: 'scenes' must be a non-empty list or object"
+                )
+            scenes_dict: dict[str, dict[str, Any]] = {}
+            for index, scene_data in enumerate(raw_scenes):
+                if not isinstance(scene_data, dict):
+                    raise StoryValidationError(
+                        f"Story {source}: scenes[{index}] must be an object"
+                    )
+                scene_id = scene_data.get("id")
+                if not isinstance(scene_id, str) or not scene_id.strip():
+                    raise StoryValidationError(
+                        f"Story {source}: scenes[{index}] must have a non-empty 'id'"
+                    )
+                scene_id = scene_id.strip()
+                if scene_id in scenes_dict:
+                    raise StoryValidationError(
+                        f"Story {source}: duplicate scene id {scene_id!r}"
+                    )
+                scenes_dict[scene_id] = scene_data
+            return scenes_dict
+
+        if isinstance(raw_scenes, dict):
+            if not raw_scenes:
+                raise StoryValidationError(
+                    f"Story {source}: 'scenes' must be a non-empty list or object"
+                )
+            return dict(raw_scenes)
+
+        raise StoryValidationError(
+            f"Story {source}: 'scenes' must be a list or object, "
+            f"got {type(raw_scenes).__name__}"
         )
 
     def _validate_choice_targets(self, scenes: dict[str, Scene], source: Path) -> None:
@@ -345,6 +414,57 @@ class StoryLoader:
                         f"Story {source}, scene {scene.id!r}: choice {action_name!r} "
                         f"references unknown scene {target_id!r}"
                     )
+
+    def _parse_choice_labels(
+        self,
+        value: Any,
+        *,
+        source: Path,
+        scene_id: str,
+        choices: dict[str, str],
+    ) -> dict[str, str]:
+        """Parse optional human-friendly labels for NFC choice cards."""
+        if value is None:
+            return {}
+        if not isinstance(value, dict):
+            raise StoryValidationError(
+                f"Story {source}, scene {scene_id!r}: 'choice_labels' must be an object"
+            )
+
+        labels: dict[str, str] = {}
+        for key, label in value.items():
+            if not isinstance(key, str) or not key.strip():
+                raise StoryValidationError(
+                    f"Story {source}, scene {scene_id!r}: "
+                    "choice_labels keys must be non-empty strings"
+                )
+            if not isinstance(label, str) or not label.strip():
+                raise StoryValidationError(
+                    f"Story {source}, scene {scene_id!r}: "
+                    f"choice_labels[{key!r}] must be a non-empty string"
+                )
+            labels[key.strip()] = label.strip()
+
+        choice_keys = set(choices)
+        label_keys = set(labels)
+        extra = label_keys - choice_keys
+        missing = choice_keys - label_keys
+        if extra:
+            logger.warning(
+                "Story %s, scene %r: choice_labels has keys not in choices: %s",
+                source,
+                scene_id,
+                sorted(extra),
+            )
+        if missing:
+            logger.warning(
+                "Story %s, scene %r: choices missing choice_labels for: %s",
+                source,
+                scene_id,
+                sorted(missing),
+            )
+
+        return labels
 
     def _parse_string_list(
         self,

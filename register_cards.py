@@ -28,9 +28,9 @@ DEFAULT_BAUD = 115200
 VALID_CARD_TYPES = frozenset({"story", "action", "item", "system"})
 
 CARDS_TO_REGISTER: list[tuple[str, str]] = [
-    ("Fantasy", "story"),
-    ("Mystery", "story"),
-    ("Space", "story"),
+    ("Benny", "story"),
+    ("Mina", "story"),
+    ("Nova", "story"),
     ("Sword", "action"),
     ("Magic", "action"),
     ("Shield", "action"),
@@ -412,7 +412,7 @@ def run_registration(
 def build_arg_parser() -> argparse.ArgumentParser:
     """Build the CLI argument parser."""
     parser = argparse.ArgumentParser(
-        description="Register physical NFC cards for the Tangible NFC Story Game.",
+        description="Register physical NFC cards for the Tangible NFC Interactive Storybook.",
     )
     parser.add_argument(
         "--port",
@@ -438,7 +438,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--card",
         metavar="NAME",
-        help="Register a single card by name (e.g. Fantasy).",
+        help="Register a single card by name (e.g. Benny).",
     )
     return parser
 

@@ -1,6 +1,6 @@
 # Module Reference
 
-Brief reference for every Python module in the Tangible NFC Story Game.
+Brief reference for every Python module in the Tangible NFC Interactive Storybook.
 
 ---
 
@@ -94,7 +94,7 @@ Brief reference for every Python module in the Tangible NFC Story Game.
 **Key classes / functions:**
 - `AssetManager` — `load_image()`, `get_placeholder()`, `image_exists()`, `clear_cache()`
 - `create_placeholder_pil_image()` — dark-themed PIL placeholder generator
-- `infer_story_type()` — genre hint from image path (fantasy/mystery/space)
+- `infer_story_type()` — story character hint from image path (Benny/Mina/Nova)
 
 **Dependencies:** `Pillow` (`PIL.Image`, `PIL.ImageTk`), `pathlib`
 

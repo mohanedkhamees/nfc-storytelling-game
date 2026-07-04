@@ -1,16 +1,28 @@
-"""Core story state machine for the Tangible NFC Story Game.
+"""Core story state machine for the Tangible NFC Interactive Storybook.
 
 Manages active story, scene transitions, inventory, and card-driven actions.
 """
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
 from card_manager import Card, CardType, UnknownCard
 from story_loader import Scene, Story, StoryLoader
+
+logger = logging.getLogger(__name__)
+
+INVALID_CHOICE_MESSAGE = "This card cannot be used here."
+
+# Canonical NFC story card display names → story ids (keys are casefolded).
+STORY_CARD_TO_ID: dict[str, str] = {
+    "benny": "benny",
+    "mina": "mina",
+    "nova": "nova",
+}
 
 
 class EngineOutcome(str, Enum):
@@ -28,6 +40,7 @@ class EngineOutcome(str, Enum):
     NO_STORY_LOADED = "no_story_loaded"
     STORY_NOT_FOUND = "story_not_found"
     STORY_ALREADY_ENDED = "story_already_ended"
+    STORY_ALREADY_ACTIVE = "story_already_active"
     ITEM_CARD_IGNORED = "item_card_ignored"
 
 
@@ -141,8 +154,8 @@ class StoryEngine:
     ------------------
     When no story is active, a ``CardType.STORY`` card starts a story whose
     ``Story.title`` or ``Story.id`` matches the card ``name`` (case-insensitive).
-    For example, card name ``"Fantasy"`` matches story id ``"fantasy"`` or title
-    ``"Fantasy Quest"``.
+    For example, card name ``"Benny"`` matches story id ``"benny"`` or title
+    ``"Benny and the Lost Crystal"``.
 
     Item cards
     ----------
@@ -226,6 +239,10 @@ class StoryEngine:
             return self._handle_system_card(card)
 
         if card.type == CardType.ITEM:
+            scene = self.get_current_scene()
+            if scene is not None and self._resolve_choice_key(scene, card.name) is not None:
+                return self._handle_action_card(card)
+
             return EngineResult(
                 outcome=EngineOutcome.ITEM_CARD_IGNORED,
                 message=(
@@ -273,13 +290,41 @@ class StoryEngine:
         return self._story is not None and self._state.story_id is not None
 
     def _handle_story_card(self, card: Card) -> EngineResult:
-        """Start a story matching the story card name."""
+        """Start a story matching the story card name.
+
+        When the same story is already in progress, ignore the scan so action
+        cards are not accidentally replaced by a return to the start scene.
+        Scanning a different story card switches to that story.
+        """
         story = self._find_story_for_card(card.name)
         if story is None:
             return EngineResult(
                 outcome=EngineOutcome.STORY_NOT_FOUND,
                 message=f"No story matches card name {card.name!r}.",
             )
+
+        if (
+            self.is_story_active()
+            and not self._state.is_ended
+            and self._state.story_id == story.id
+        ):
+            logger.info(
+                "Story card ignored: story=%s scene=%s card=%r",
+                self._state.story_id,
+                self._state.scene_id,
+                card.name,
+            )
+            return EngineResult(
+                outcome=EngineOutcome.STORY_ALREADY_ACTIVE,
+                message=(
+                    f"Story already in progress ({self._state.story_id!r}). "
+                    "Scan action cards or Restart to play again."
+                ),
+                story_id=self._state.story_id,
+                new_scene_id=self._state.scene_id,
+                inventory=tuple(self._state.inventory.items),
+            )
+
         return self._activate_story(story)
 
     def _handle_action_card(self, card: Card) -> EngineResult:
@@ -291,17 +336,50 @@ class StoryEngine:
                 message="No active scene.",
             )
 
-        next_scene_id = scene.choices.get(card.name)
-        if next_scene_id is None:
+        choice_keys = list(scene.choices.keys())
+        action_key = self._resolve_choice_key(scene, card.name)
+        target_scene_id = scene.choices.get(action_key) if action_key else None
+
+        logger.info(
+            "Choice lookup: scene=%s choices=%s action=%r matched=%r target=%s",
+            scene.id,
+            choice_keys,
+            card.name,
+            action_key,
+            target_scene_id,
+        )
+
+        if action_key is None or target_scene_id is None:
             return EngineResult(
                 outcome=EngineOutcome.INVALID_ACTION,
-                message=f"{card.name!r} is not available in the current scene.",
+                message=INVALID_CHOICE_MESSAGE,
                 story_id=self._state.story_id,
                 new_scene_id=self._state.scene_id,
                 inventory=tuple(self._state.inventory.items),
             )
 
-        return self._transition_to_scene(next_scene_id, previous_scene_id=scene.id)
+        return self._transition_to_scene(target_scene_id, previous_scene_id=scene.id)
+
+    @staticmethod
+    def _resolve_choice_key(scene: Scene, action_name: str) -> str | None:
+        """Map a scanned action name to the canonical key in ``scene.choices``.
+
+        Compares stripped names case-insensitively so NFC/debug input matches JSON
+        choice keys regardless of minor casing differences.
+        """
+        normalized = action_name.strip()
+        if not normalized:
+            return None
+
+        if normalized in scene.choices:
+            return normalized
+
+        lowered = normalized.casefold()
+        for key in scene.choices:
+            if key.casefold() == lowered:
+                return key
+
+        return None
 
     def _handle_system_card(self, card: Card) -> EngineResult:
         """Handle system cards such as Restart."""
@@ -424,8 +502,26 @@ class StoryEngine:
         )
 
     def _find_story_for_card(self, card_name: str) -> Story | None:
-        """Find a story whose id or title matches the card name (case-insensitive)."""
+        """Find a story whose id or title matches the card name (case-insensitive).
+
+        Resolution order:
+        1. Explicit ``STORY_CARD_TO_ID`` entry (e.g. card ``"Benny"`` → ``"benny"``).
+        2. Exact story id match.
+        3. Exact full-title match.
+
+        Never falls back to the first loaded story.
+        """
         normalized = card_name.strip().casefold()
+        if not normalized:
+            return None
+
+        mapped_id = STORY_CARD_TO_ID.get(normalized)
+        if mapped_id is not None:
+            try:
+                return self._loader.load_story(mapped_id)
+            except Exception:
+                return None
+
         for story_id in self._loader.list_available_stories():
             story = self._loader.load_story(story_id)
             if story.id.casefold() == normalized:
@@ -461,10 +557,10 @@ if __name__ == "__main__":
 
     print(f"Available stories: {loader.list_available_stories()}")
 
-    fantasy_card = Card(uid="A1B2C3D4", name="Fantasy", type=CardType.STORY)
-    result = engine.handle_card(fantasy_card)
+    benny_card = Card(uid="A1B2C3D4", name="Benny", type=CardType.STORY)
+    result = engine.handle_card(benny_card)
     scene = engine.get_current_scene()
-    _print_result("1. Story card scan (Fantasy)", result, scene)
+    _print_result("1. Story card scan (Benny)", result, scene)
 
     sword_card = Card(uid="11223344", name="Sword", type=CardType.ACTION)
     result = engine.handle_card(sword_card)

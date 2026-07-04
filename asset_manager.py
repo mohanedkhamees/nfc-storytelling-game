@@ -16,15 +16,19 @@ COLOR_MUTED = "#a0a0a0"
 
 SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg"}
 
-_STORY_TYPES = ("fantasy", "mystery", "space")
+_STORY_IMAGE_DIRS: dict[str, str] = {
+    "fantasy": "Benny",
+    "mystery": "Mina",
+    "space": "Nova",
+}
 
 
 def infer_story_type(path: str) -> str | None:
-    """Return a capitalized story genre hint from an image path, if detectable."""
+    """Return a story character hint from an image path, if detectable."""
     lower = path.replace("\\", "/").lower()
-    for story in _STORY_TYPES:
-        if f"/{story}/" in lower:
-            return story.capitalize()
+    for folder, label in _STORY_IMAGE_DIRS.items():
+        if f"/{folder}/" in lower:
+            return label
     return None
 
 
@@ -38,7 +42,7 @@ def create_placeholder_pil_image(
     Args:
         size: Target width and height in pixels.
         label: Primary message (e.g. ``"Missing Image"``).
-        scene_hint: Optional genre hint (Fantasy, Mystery, Space).
+        scene_hint: Optional story character hint (Benny, Mina, Nova).
 
     Returns:
         A new RGB ``Image`` filled with the UI background color and label text.

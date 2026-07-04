@@ -39,9 +39,9 @@ Verification status for all project components (Step 13).
 | Item | Status | Notes |
 |------|--------|-------|
 | `data/cards.json` | ✅ | 12 cards registered (3 story, 7 action, 1 item, 1 system) |
-| `stories/fantasy.json` | ✅ | Complete branching story with inventory and endings |
-| `stories/mystery.json` | ✅ | Complete branching story with inventory and endings |
-| `stories/space.json` | ✅ | Complete branching story with inventory and endings |
+| `stories/benny.json` | ✅ | Complete branching story with inventory and endings |
+| `stories/mina.json` | ✅ | Complete branching story with inventory and endings |
+| `stories/nova.json` | ✅ | Complete branching story with inventory and endings |
 | Scene images | ✅ | `assets/images/{fantasy,mystery,space}/` — 42 PNG files |
 | Placeholder generator | ✅ | `generate_placeholders.py` creates missing PNGs without overwrite |
 

@@ -1,4 +1,4 @@
-"""Application composition root for the Tangible NFC Story Game.
+"""Application composition root for the Tangible NFC Interactive Storybook.
 
 Wires serial I/O, card mapping, story engine, and Tkinter UI. All gameplay
 logic stays in :mod:`story_engine`; this module only orchestrates callbacks
@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 from card_manager import Card, CardManager, CardType
-from story_engine import EngineOutcome, EngineResult, StoryEngine
+from story_engine import STORY_CARD_TO_ID, EngineOutcome, EngineResult, StoryEngine
 from story_loader import StoryLoadError, StoryLoader
 
 logger = logging.getLogger(__name__)
@@ -26,9 +26,9 @@ DEFAULT_STORIES_DIR = PROJECT_ROOT / "stories"
 DEFAULT_ASSETS_DIR = PROJECT_ROOT / "assets"
 
 CLI_SUPPORTED_CARDS = [
-    "Fantasy",
-    "Mystery",
-    "Space",
+    "Benny",
+    "Mina",
+    "Nova",
     "Sword",
     "Magic",
     "Shield",
@@ -118,22 +118,26 @@ def find_card_by_name(card_manager: CardManager, card_name: str) -> Card | None:
     return None
 
 
-def collect_story_names(card_manager: CardManager, story_loader: StoryLoader) -> list[str]:
-    """Return story card names for the start screen."""
-    story_cards = card_manager.get_cards_by_type(CardType.STORY)
-    names = sorted({card.name for card in story_cards})
+def collect_story_titles(story_loader: StoryLoader) -> list[str]:
+    """Return story display titles for the start screen from loaded JSON files."""
+    return story_loader.list_story_titles()
 
-    for story_id in story_loader.list_available_stories():
+
+def collect_story_entries(
+    story_loader: StoryLoader,
+    card_manager: CardManager,
+) -> list[tuple[str, str]]:
+    """Return ``(title, story_card_name)`` pairs for the start screen, sorted by title."""
+    entries: list[tuple[str, str]] = []
+    for card in card_manager.get_cards_by_type(CardType.STORY):
+        story_id = STORY_CARD_TO_ID.get(card.name.strip().casefold(), card.name.strip().casefold())
         try:
             story = story_loader.load_story(story_id)
-            if story.title not in names:
-                names.append(story.title)
         except Exception:
-            logger.debug("Could not load story %s for start screen", story_id)
-
-    if not names:
-        names = ["Fantasy", "Mystery", "Space"]
-    return names
+            logger.debug("Could not resolve story for card %r", card.name)
+            continue
+        entries.append((story.title, card.name))
+    return sorted(entries, key=lambda pair: pair[0].casefold())
 
 
 def _get_active_story_title(story_loader: StoryLoader, story_engine: StoryEngine) -> str:
@@ -174,6 +178,10 @@ def _log_engine_result(result: EngineResult, last_inventory: tuple[str, ...]) ->
             result.previous_scene_id,
             result.new_scene_id,
         )
+    elif outcome == EngineOutcome.STORY_ALREADY_ENDED:
+        logger.info("Story already ended: %s", result.message)
+    elif outcome == EngineOutcome.STORY_ALREADY_ACTIVE:
+        logger.info("Story already active: %s", result.message)
     elif outcome == EngineOutcome.INVALID_ACTION:
         logger.info("Invalid action: %s", result.message)
     elif outcome == EngineOutcome.UNKNOWN_CARD:
@@ -191,7 +199,7 @@ def _log_engine_result(result: EngineResult, last_inventory: tuple[str, ...]) ->
 
 
 def _print_cli_start_screen(story_names: list[str]) -> None:
-    print("\n=== Tangible NFC Story Game (CLI) ===")
+    print("\n=== Tangible NFC Interactive Storybook (CLI) ===")
     print("Scan a Story Card to begin.\n")
     print("Available stories:")
     for name in story_names:
@@ -256,7 +264,7 @@ def _apply_cli_engine_result(
         return updated_inventory
 
     if outcome == EngineOutcome.INVALID_ACTION:
-        _print_cli_error("This card cannot be used in the current scene.")
+        _print_cli_error("This card cannot be used here.")
         return updated_inventory
 
     if outcome == EngineOutcome.MISSING_ITEMS:
@@ -264,7 +272,7 @@ def _apply_cli_engine_result(
         return updated_inventory
 
     if outcome == EngineOutcome.NO_STORY_LOADED:
-        _print_cli_start_screen(collect_story_names(card_manager, story_loader))
+        _print_cli_start_screen(collect_story_titles(story_loader))
         _print_cli_status(result.message)
         return updated_inventory
 
@@ -274,6 +282,20 @@ def _apply_cli_engine_result(
 
     if outcome == EngineOutcome.STORY_ALREADY_ENDED:
         _print_cli_status(result.message)
+        return updated_inventory
+
+    if outcome == EngineOutcome.STORY_ALREADY_ACTIVE:
+        _print_cli_status(result.message)
+        if story_engine.is_story_active():
+            scene = story_engine.get_current_scene()
+            if scene is not None:
+                state = story_engine.get_state()
+                _print_cli_scene(
+                    story_title=_get_active_story_title(story_loader, story_engine),
+                    scene=scene,
+                    inventory=list(state.inventory.items),
+                    choices=sorted(scene.choices.keys()),
+                )
         return updated_inventory
 
     if outcome == EngineOutcome.ITEM_CARD_IGNORED:
@@ -329,7 +351,7 @@ def _apply_cli_engine_result(
 def run_cli(*, debug: bool = False, input_fn=input) -> None:
     """Run the game in terminal mode without Tkinter or Arduino."""
     configure_logging(debug=debug)
-    logger.info("Starting Tangible NFC Story Game (CLI mode, debug=%s)", debug)
+    logger.info("Starting Tangible NFC Interactive Storybook (CLI mode, debug=%s)", debug)
 
     card_manager, cards_error = init_card_manager()
     story_loader, _, story_error = init_story_loader()
@@ -340,8 +362,8 @@ def run_cli(*, debug: bool = False, input_fn=input) -> None:
     if story_error:
         _print_cli_error(story_error)
 
-    story_names = collect_story_names(card_manager, story_loader)
-    _print_cli_start_screen(story_names)
+    story_titles = collect_story_titles(story_loader)
+    _print_cli_start_screen(story_titles)
 
     last_inventory: tuple[str, ...] = ()
 
@@ -409,7 +431,7 @@ class GameApplication:
         logger.info("Tkinter root window created successfully")
 
         logger.info(
-            "Starting Tangible NFC Story Game (hardware=%s, debug=%s)",
+            "Starting Tangible NFC Interactive Storybook (hardware=%s, debug=%s)",
             self._hardware_mode,
             debug,
         )
@@ -421,17 +443,18 @@ class GameApplication:
 
         self._story_engine = StoryEngine(self._story_loader)
 
-        story_names = collect_story_names(self._card_manager, self._story_loader)
+        story_entries = collect_story_entries(self._story_loader, self._card_manager)
 
         self._ui = GameUI(
             self._root,
             DEFAULT_ASSETS_DIR,
             debug_mode=debug,
-            story_names=story_names,
+            story_entries=story_entries,
             asset_manager=self._asset_manager,
         )
         if debug:
             self._ui.register_simulate_callback(self._simulate_card_by_name)
+            self._ui.register_choice_callback(self._on_choice_clicked)
 
         if self._cards_load_error:
             self._ui.show_error(self._cards_load_error)
@@ -495,20 +518,82 @@ class GameApplication:
         elif not self._story_engine.is_story_active():
             self._ui.set_status("Waiting for NFC card...")
 
+    def _log_active_scene_choices(self, *, source: str, action_key: str) -> None:
+        """Log story/scene context and the resolved target before handling a scan."""
+        state = self._story_engine.get_state()
+        scene = self._story_engine.get_current_scene()
+        if scene is None:
+            logger.info(
+                "%s: story=%s scene=%s choices=[] action=%r target=%s",
+                source,
+                state.story_id,
+                state.scene_id,
+                action_key,
+                None,
+            )
+            return
+
+        target_scene_id = scene.choices.get(action_key)
+        if target_scene_id is None:
+            resolved = StoryEngine._resolve_choice_key(scene, action_key)
+            if resolved is not None:
+                target_scene_id = scene.choices.get(resolved)
+
+        logger.info(
+            "%s: story=%s scene=%s choices=%s action=%r target=%s",
+            source,
+            state.story_id,
+            scene.id,
+            list(scene.choices.keys()),
+            action_key,
+            target_scene_id,
+        )
+
+    def _resolve_card_for_action(self, action_key: str) -> Card:
+        """Return a registered card for *action_key*, or a synthetic action card."""
+        card = find_card_by_name(self._card_manager, action_key)
+        if card is not None:
+            return card
+
+        logger.warning(
+            "No registered card for action %r — using synthetic action card",
+            action_key,
+        )
+        return Card(
+            uid=f"DEBUG-{action_key.strip().upper()}",
+            name=action_key.strip(),
+            type=CardType.ACTION,
+        )
+
+    def _handle_card_scan(self, card: Card, *, source: str) -> None:
+        """Route a scanned card through the engine without restarting an active story."""
+        self._ui.set_last_scanned(card.name, card.uid)
+        self._log_active_scene_choices(source=source, action_key=card.name)
+        result = self._story_engine.handle_card(card)
+        self._apply_engine_result(result)
+
+    def _on_choice_clicked(self, choice_key: str) -> None:
+        """Debug helper: simulate scanning the NFC card matching a scene choice key."""
+        card = self._resolve_card_for_action(choice_key)
+        self._handle_card_scan(card, source="Choice click")
+
     def _handle_uid(self, uid: str) -> None:
         """Process a scanned UID on the main thread."""
         logger.info("UID received: %s", uid)
 
         card = self._card_manager.get_card_by_uid(uid)
         if isinstance(card, Card):
-            logger.info("Card mapped: %s (type=%s)", card.name, card.type.value)
-            display_uid = card.uid
-        else:
-            logger.warning("Unknown UID: %s", uid)
-            display_uid = uid
+            logger.info(
+                "Card mapped: %s (type=%s, uid=%s)",
+                card.name,
+                card.type.value,
+                card.uid,
+            )
+            self._handle_card_scan(card, source="UID scan")
+            return
 
-        self._ui.set_last_scanned(card.name, display_uid)
-
+        logger.warning("Unknown UID: %s", uid)
+        self._ui.set_last_scanned(card.name, uid)
         result = self._story_engine.handle_card(card)
         self._apply_engine_result(result)
 
@@ -521,9 +606,7 @@ class GameApplication:
             return
 
         logger.info("Debug simulate: %s (uid=%s)", card.name, card.uid)
-        self._ui.set_last_scanned(card.name, card.uid)
-        result = self._story_engine.handle_card(card)
-        self._apply_engine_result(result)
+        self._handle_card_scan(card, source="Debug simulate")
 
     def _apply_engine_result(self, result: EngineResult) -> None:
         """Map engine outcomes to UI screen transitions, logging, and status messages."""
@@ -535,7 +618,7 @@ class GameApplication:
             return
 
         if outcome == EngineOutcome.INVALID_ACTION:
-            self._ui.show_error("This card cannot be used in the current scene.")
+            self._ui.show_error("This card cannot be used here.")
             return
 
         if outcome == EngineOutcome.MISSING_ITEMS:
@@ -553,6 +636,12 @@ class GameApplication:
 
         if outcome == EngineOutcome.STORY_ALREADY_ENDED:
             self._ui.set_status(result.message)
+            return
+
+        if outcome == EngineOutcome.STORY_ALREADY_ACTIVE:
+            self._ui.set_status(result.message)
+            if self._story_engine.is_story_active():
+                self._show_current_scene()
             return
 
         if outcome == EngineOutcome.ITEM_CARD_IGNORED:
@@ -639,7 +728,7 @@ def run_gui(*, hardware_mode: bool, debug: bool) -> None:
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     """Parse CLI arguments for hardware vs debug vs terminal operation."""
     parser = argparse.ArgumentParser(
-        description="Tangible NFC Interactive Storytelling Game",
+        description="Tangible NFC Interactive Storybook for Children",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "Examples:\n"

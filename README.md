@@ -1,4 +1,4 @@
-# Tangible NFC Interactive Storytelling Game
+# Tangible NFC Interactive Storybook for Children
 
 A university Natural User Interfaces (NUI) project that combines **physical NFC cards**, **Arduino hardware**, and **interactive branching storytelling**. Players advance offline stories by scanning tangible cards — not by clicking GUI buttons.
 
@@ -6,7 +6,7 @@ A university Natural User Interfaces (NUI) project that combines **physical NFC 
 
 ## Project Overview
 
-This game lets players explore three branching narratives (Fantasy, Mystery, Space) by placing NFC tags on an RC522 reader connected to an Arduino Uno. The microcontroller sends card UIDs over USB serial; a Python application maps each UID to a symbolic card name, drives a story state machine, and updates a dark-mode Tkinter display.
+This game lets players explore three children’s branching narratives — *Benny and the Lost Crystal*, *Mina and the Missing Moon Lantern*, and *Nova and the Friendly Star* — by placing NFC tags on an RC522 reader connected to an Arduino Uno. The microcontroller sends card UIDs over USB serial; a Python application maps each UID to a symbolic card name, drives a story state machine, and updates a bright, child-friendly Tkinter display.
 
 The GUI is **display-only** in production mode. Every story choice is made by scanning the corresponding physical card — preserving an authentic tangible interaction model suitable for NUI coursework and live demonstration.
 
@@ -15,8 +15,8 @@ The GUI is **display-only** in production mode. Every story choice is made by sc
 ## Features
 
 - **Tangible NFC input** — story, action, item, and system cards as physical artifacts
-- **Three complete branching stories** — multiple scenes, inventory gating, and endings per genre
-- **Dark-mode Tkinter GUI** — scene images, narrative text, choice highlights, inventory panel
+- **Three complete children’s stories** — Benny and the Lost Crystal, Mina and the Missing Moon Lantern, and Nova and the Friendly Star
+- **Bright child-friendly Tkinter GUI** — pastel story cards, scene images, narrative text, colorful choice pills, backpack inventory panel
 - **Arduino RC522 integration** — auto-detected serial port, debounced scans, auto-reconnect
 - **Debug mode** — simulate all 12 cards without hardware (keyboard shortcuts + panel)
 - **Card registration CLI** — guided enrollment of physical tags into `data/cards.json`
@@ -64,9 +64,9 @@ tangible-nfc-story-game/
 │   └── rc522_reader.ino          # RC522 firmware (UID → serial)
 ├── assets/
 │   └── images/
-│       ├── fantasy/              # Fantasy scene PNGs
-│       ├── mystery/              # Mystery scene PNGs
-│       ├── space/                # Space scene PNGs
+│       ├── fantasy/              # Benny story scene PNGs
+│       ├── mystery/              # Mina story scene PNGs
+│       ├── space/                # Nova story scene PNGs
 │       └── placeholders/
 ├── data/
 │   └── cards.json                # UID → card name/type registry
@@ -77,9 +77,9 @@ tangible-nfc-story-game/
 │   ├── MODULES.md                # Module reference
 │   └── PROJECT_REPORT.md         # University project conclusion
 ├── stories/
-│   ├── fantasy.json
-│   ├── mystery.json
-│   └── space.json
+│   ├── benny.json
+│   ├── mina.json
+│   └── nova.json
 ├── tests/                        # pytest unit tests
 ├── main.py                       # Application entry point
 ├── ui.py                         # Tkinter GUI
@@ -208,9 +208,9 @@ python3 main.py --debug
 
 | Key | Card |
 |-----|------|
-| 1 | Fantasy |
-| 2 | Mystery |
-| 3 | Space |
+| 1 | Benny |
+| 2 | Mina |
+| 3 | Nova |
 | 4 | Sword |
 | 5 | Magic |
 | 6 | Shield |
@@ -239,12 +239,12 @@ python3 main.py --cli
 
 At the `Card>` prompt, enter a registered card name (case-insensitive). Names with spaces work, e.g. `Open Door`. Type `quit` to exit.
 
-**Supported cards:** Fantasy, Mystery, Space, Sword, Magic, Shield, Run, Key, Talk, Hide, Open Door, Restart
+**Supported cards:** Benny, Mina, Nova, Sword, Magic, Shield, Run, Key, Talk, Hide, Open Door, Restart
 
 Example session:
 
 ```bash
-echo -e "Fantasy\nSword\nquit" | python3 main.py --debug --cli
+echo -e "Benny\nTalk\nquit" | python3 main.py --debug --cli
 ```
 
 CLI mode does not use Arduino serial I/O. Combine `--debug` for verbose log output on stdout.
@@ -264,8 +264,8 @@ python3 main.py --hardware
 1. Upload Arduino firmware and wire the RC522 (see above).
 2. Register physical cards (see [Registering RFID Cards](#registering-rfid-cards)).
 3. Launch the game — the app auto-detects the Arduino serial port at **115200 baud**.
-4. Scan a **story card** (Fantasy, Mystery, or Space) to begin.
-5. Scan **action cards** matching the highlighted choices on screen.
+4. Scan a **story card** (Benny, Mina, or Nova) to begin.
+5. Scan **action cards** (tangible NFC decision cards) matching the highlighted choices on screen.
 6. At an ending, scan the **Restart** card to play again.
 
 If no serial port is found at startup, the UI shows a reconnect message and the reader keeps retrying in the background.
@@ -282,7 +282,7 @@ Physical NFC tags must be enrolled in `data/cards.json` before the game recogniz
 
 ```json
 {
-  "A1B2C3D4": { "name": "Fantasy", "type": "story" }
+  "A1B2C3D4": { "name": "Benny", "type": "story" }
 }
 ```
 
@@ -304,7 +304,7 @@ The tool walks through all 12 cards in order. For each card, place the matching 
 python3 register_cards.py --port /dev/ttyUSB0   # explicit serial port
 python3 register_cards.py --baud 115200         # default baud rate
 python3 register_cards.py --list                # show current mappings
-python3 register_cards.py --card Fantasy        # register one card only
+python3 register_cards.py --card Benny        # register one card only
 ```
 
 Before saving, the tool backs up the existing registry to `data/cards_backup_YYYYMMDD_HHMMSS.json`, validates JSON structure, and prints a summary table (UID | Name | Type).
@@ -313,7 +313,7 @@ Before saving, the tool backs up the existing registry to `data/cards_backup_YYY
 
 ## Story System
 
-Stories live in `stories/` as JSON files. Each file defines:
+Stories live in `stories/` as JSON files and are discovered automatically at startup (`benny.json`, `mina.json`, `nova.json`). Each file defines:
 
 - `id`, `title`, `start_scene`
 - `scenes` — a graph of scene nodes with `text`, `image`, `choices`, and optional `required_items`, `gained_items`, `lost_items`, and `ending`
@@ -408,12 +408,12 @@ Use this sequence for a live or recorded demonstration:
 
 1. **Introduce tangible NUI concept** — cards as physical input, GUI as display only
 2. **Show start screen** — `python3 main.py --hardware` (or `--debug` as fallback)
-3. **Scan Fantasy story card** — first scene appears with image and choices
-4. **Scan Sword action card** — scene transition; note inventory change if applicable
+3. **Scan Benny story card** — first scene appears with image and choices
+4. **Scan Talk action card** — scene transition; note inventory change if applicable
 5. **Scan an invalid card** — show error feedback in status bar
 6. **Play through to an ending** — highlight branching and inventory gating
 7. **Scan Restart card** — story resets to start scene
-8. **Briefly show Mystery or Space** — demonstrate story switching
+8. **Briefly show Mina or Nova** — demonstrate story switching
 9. **Mention debug mode and tests** — `python3 main.py --debug`, pytest count
 
 ### Backup plan
@@ -430,7 +430,7 @@ Or CLI mode if the GUI is unavailable:
 python3 main.py --debug --cli
 ```
 
-Use keyboard shortcuts (1 = Fantasy, 4 = Sword, = = Restart) to complete the same demo flow.
+Use keyboard shortcuts (1 = Benny, 4 = Sword, = = Restart) to complete the same demo flow.
 
 If the GUI crashes (common on some macOS setups), use CLI mode instead:
 
@@ -438,7 +438,7 @@ If the GUI crashes (common on some macOS setups), use CLI mode instead:
 python3 main.py --debug --cli
 ```
 
-Type card names at the prompt (`Fantasy`, `Sword`, `Restart`, etc.) to complete the same demo flow.
+Type card names at the prompt (`Benny`, `Talk`, `Restart`, etc.) to complete the same demo flow.
 
 ---
 
@@ -477,4 +477,4 @@ python3 register_cards.py --help
 
 ---
 
-*Natural User Interfaces — Tangible NFC Interactive Storytelling Game*
+*Natural User Interfaces — Tangible NFC Interactive Storybook for Children*

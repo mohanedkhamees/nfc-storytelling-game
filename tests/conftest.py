@@ -1,4 +1,4 @@
-"""Shared pytest fixtures for the Tangible NFC Story Game."""
+"""Shared pytest fixtures for the Tangible NFC Interactive Storybook."""
 
 from __future__ import annotations
 

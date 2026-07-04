@@ -1,4 +1,4 @@
-"""UID-to-card mapping for the Tangible NFC Story Game.
+"""UID-to-card mapping for the Tangible NFC Interactive Storybook.
 
 Loads card definitions from ``data/cards.json`` and maps raw NFC UIDs
 (from :mod:`serial_reader`) to structured :class:`Card` objects.
@@ -181,7 +181,7 @@ if __name__ == "__main__":
         ("a1b2 c3d4", "known story card (lowercase + spaces)"),
         ("11223344", "known action card"),
         ("99AABBCC", "known item card"),
-        ("DEADBEEF", "known story card (Mystery)"),
+        ("B1C2D3E4", "known story card (Mina)"),
         ("FFFFFFFF", "unknown card"),
     ]
 

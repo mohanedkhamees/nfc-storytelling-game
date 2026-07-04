@@ -1,4 +1,4 @@
-# Architecture — Tangible NFC Interactive Storytelling Game
+# Architecture — Tangible NFC Interactive Storybook for Children
 
 **Course:** Natural User Interfaces (NUI)  
 **Version:** Step 2 — Architecture Design  
@@ -87,7 +87,7 @@ flowchart TB
 |------|----------------|
 | `arduino/` | Arduino Uno firmware (Step 3). Contains the RC522 sketch using the MFRC522 library. Reads NFC UIDs and writes them as newline-terminated strings over USB serial at 9600 baud. No game logic on the microcontroller. |
 | `assets/` | Scene images referenced by story JSON (`"image": "castle.png"`). Organized flat or by story subfolder; paths resolved relative to `assets/`. |
-| `stories/` | One JSON file per story (`fantasy.json`, `mystery.json`, `space.json`). Each file defines scenes, choices, optional item grants, and ending markers. Adding a story requires only a new file — no code change. |
+| `stories/` | One JSON file per story (`benny.json`, `mina.json`, `nova.json`). Each file defines scenes, choices, optional item grants, and ending markers. Adding a story requires only a new file — no code change. |
 | `data/cards.json` | UID-to-card registry. Each key is an uppercase UID; values are objects with `name` and `type` (`story`, `action`, `item`, `system`). Populated once physical cards are enrolled. |
 | `saves/` *(planned)* | Auto-created directory for save files written by `SaveManager`. Not tracked in git. |
 | `docs/` | Project documentation. This architecture document and future design notes. |
@@ -332,7 +332,7 @@ flowchart TD
     H -->|No| I[UI: Unknown card status message]
     H -->|Yes| J[card_name e.g. Sword]
     J --> K{Story active?}
-    K -->|No| L{card_name is Story Card?<br/>Fantasy / Mystery / Space}
+    K -->|No| L{card_name is Story Card?<br/>Benny / Mina / Nova}
     L -->|Yes| M[StoryLoader.load story_id]
     M --> N[StoryEngine.load_story]
     N --> O[UI: render first scene]
@@ -352,7 +352,7 @@ flowchart TD
 
 ### Story selection flow (first scan)
 
-Story cards (`"Fantasy"`, `"Mystery"`, `"Space"`) are ordinary entries in `data/cards.json`. When no story is active, scanning a story card triggers `StoryLoader.load()` instead of a scene choice. This keeps the card system uniform — no special-case hardware.
+Story cards (`"Benny"`, `"Mina"`, `"Nova"`) are ordinary entries in `data/cards.json`. When no story is active, scanning a story card triggers `StoryLoader.load()` instead of a scene choice. This keeps the card system uniform — no special-case hardware.
 
 ---
 
@@ -362,7 +362,7 @@ Story cards (`"Fantasy"`, `"Mystery"`, `"Space"`) are ordinary entries in `data/
 
 ```json
 {
-  "3AF12491": { "name": "Fantasy", "type": "story" },
+  "3AF12491": { "name": "Benny", "type": "story" },
   "3AF18811": { "name": "Sword", "type": "action" },
   "4B02A1C3": { "name": "Key", "type": "item" }
 }
@@ -370,14 +370,14 @@ Story cards (`"Fantasy"`, `"Mystery"`, `"Space"`) are ordinary entries in `data/
 
 Keys are uppercase-normalized UID strings. Each value is an object with `name` (matches story choice keys or story identifiers) and `type` (`story`, `action`, `item`, or `system`).
 
-### 6.2 Story JSON (`stories/fantasy.json`)
+### 6.2 Story JSON (`stories/benny.json`)
 
 Base format (required fields per original spec):
 
 ```json
 {
-  "id": "fantasy",
-  "title": "Fantasy Quest",
+  "id": "benny",
+  "title": "Benny and the Lost Crystal",
   "start_scene": "castle",
   "scenes": {
     "castle": {

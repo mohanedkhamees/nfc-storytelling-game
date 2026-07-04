@@ -1,6 +1,6 @@
 # Architecture & Flow Diagrams
 
-Text diagrams for the Tangible NFC Interactive Storytelling Game.
+Text diagrams for the Tangible NFC Interactive Storybook for Children.
 
 ---
 
@@ -91,7 +91,7 @@ Player journey from start to ending:
                     └────────┬────────┘
                              │
                     Scan STORY card
-                    (Fantasy / Mystery / Space)
+                    (Benny / Mina / Nova)
                              │
                              ▼
                     ┌─────────────────┐
@@ -234,9 +234,9 @@ tangible-nfc-story-game/
 │   ├── PROJECT_REPORT.md
 │   └── FINAL_CHECKLIST.md
 ├── stories/
-│   ├── fantasy.json
-│   ├── mystery.json
-│   └── space.json
+│   ├── benny.json
+│   ├── mina.json
+│   └── nova.json
 └── tests/
     ├── conftest.py
     ├── test_asset_manager.py
@@ -246,4 +246,4 @@ tangible-nfc-story-game/
     └── test_story_loader.py
 ```
 
-**Image counts:** Fantasy 14, Mystery 10, Space 11 (42 scene images total).
+**Image counts:** Benny 14, Mina 10, Nova 11 (42 scene images total).

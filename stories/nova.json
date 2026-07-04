@@ -1,0 +1,475 @@
+{
+  "id": "nova",
+  "title": "Nova and the Friendly Star",
+  "start_scene": "bedroom",
+  "scenes": [
+    {
+      "id": "bedroom",
+      "title": "A Light at the Window",
+      "text": "Nova is building a cardboard rocket when a tiny star falls into the garden. It whispers, “I lost my way home.”",
+      "image": "assets/images/space/bedroom.png",
+      "choices": {
+        "Talk": "star_friend",
+        "Run": "backyard",
+        "Key": "rocket_key"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Befriend Stella the star",
+        "Run": "🏃 Run — Check the backyard launch pad",
+        "Key": "🗝️ Key — Find the Rocket Key in your desk"
+      }
+    },
+    {
+      "id": "star_friend",
+      "title": "Stella the Star",
+      "text": "The tiny star’s name is Stella. She belongs to the Sky Garden beyond the Moon. Nova promises to help.",
+      "image": "assets/images/space/stella.png",
+      "choices": {
+        "Run": "rocket_pad",
+        "Magic": "starlight_map"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Stella"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Head to the rocket pad",
+        "Magic": "✨ Magic — Ask Stella for a starlight map"
+      }
+    },
+    {
+      "id": "rocket_key",
+      "title": "The Rocket Key",
+      "text": "Inside Nova’s desk drawer is a shiny toy key. When Stella touches it, the key turns into a real Rocket Key.",
+      "image": "assets/images/space/key.png",
+      "choices": {
+        "Run": "rocket_pad",
+        "Talk": "star_friend"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Rocket Key"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Go to the glowing rocket pad",
+        "Talk": "💬 Talk — Tell Stella about the key"
+      }
+    },
+    {
+      "id": "backyard",
+      "title": "The Backyard Launch Pad",
+      "text": "Behind the house, Nova’s cardboard rocket now glows with silver lines. The door is locked, and the stars seem to be waiting.",
+      "image": "assets/images/space/backyard.png",
+      "choices": {
+        "Key": "rocket_pad",
+        "Magic": "starlight_map",
+        "Run": "neighbor_roof"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Key": "🗝️ Key — Unlock the rocket door",
+        "Magic": "✨ Magic — Draw a starlight map",
+        "Run": "🏃 Run — Climb to the neighbor's roof"
+      }
+    },
+    {
+      "id": "starlight_map",
+      "title": "The Starlight Map",
+      "text": "Stella draws a map in the air: Moon Station, Comet Bridge, Planet of Colors, and finally the Sky Garden.",
+      "image": "assets/images/space/map.png",
+      "choices": {
+        "Run": "rocket_pad",
+        "Talk": "star_friend"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Starlight Map"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Launch from the rocket pad",
+        "Talk": "💬 Talk — Plan the trip with Stella"
+      }
+    },
+    {
+      "id": "neighbor_roof",
+      "title": "The Neighbor’s Roof",
+      "text": "Nova climbs carefully to the neighbor’s roof. The rocket is still locked below, but Nova sees a satellite flashing a pattern.",
+      "image": "assets/images/space/roof.png",
+      "choices": {
+        "Talk": "robot_signal",
+        "Run": "rocket_pad"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Answer Robo-Bip's signal",
+        "Run": "🏃 Run — Climb down to the rocket pad"
+      }
+    },
+    {
+      "id": "robot_signal",
+      "title": "Robo-Bip’s Signal",
+      "text": "A tiny robot voice comes through an old walkie-talkie: “Beep! I can help navigate, but I need a battery.”",
+      "image": "assets/images/space/robot_signal.png",
+      "choices": {
+        "Shield": "find_battery",
+        "Run": "rocket_pad"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Robo-Bip Signal"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Shield": "🛡️ Shield — Search the toolbox for a battery",
+        "Run": "🏃 Run — Return to the rocket pad"
+      }
+    },
+    {
+      "id": "find_battery",
+      "title": "The Spare Battery",
+      "text": "Nova finds a spare battery in the toolbox. Robo-Bip wakes up fully and downloads the safest route to the rocket.",
+      "image": "assets/images/space/battery.png",
+      "choices": {
+        "Run": "rocket_pad"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Battery",
+        "Robo-Bip"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Launch with Robo-Bip's help"
+      }
+    },
+    {
+      "id": "rocket_pad",
+      "title": "The Rocket Door",
+      "text": "The rocket door shines. Nova can open it with the Rocket Key or ask Stella to guide the controls with starlight.",
+      "image": "assets/images/space/rocket_pad.png",
+      "choices": {
+        "Key": "launch",
+        "Magic": "launch",
+        "Talk": "safety_check"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Key": "🗝️ Key — Open the rocket with the Rocket Key",
+        "Magic": "✨ Magic — Let Stella guide the controls",
+        "Talk": "💬 Talk — Run a safety check first"
+      }
+    },
+    {
+      "id": "safety_check",
+      "title": "Safety First",
+      "text": "Nova checks the helmet, seatbelt, oxygen meter, and snack pocket. Stella giggles. “Every explorer needs snacks.”",
+      "image": "assets/images/space/safety.png",
+      "choices": {
+        "Open Door": "launch",
+        "Run": "launch"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Safety Check"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Open Door": "🚪 Open Door — Board and launch the rocket",
+        "Run": "🏃 Run — Blast off into space"
+      }
+    },
+    {
+      "id": "launch",
+      "title": "Lift Off!",
+      "text": "The rocket rises above the clouds. Earth becomes a blue marble below. Stella glows brighter, but a red light blinks on the control panel.",
+      "image": "assets/images/space/launch.png",
+      "choices": {
+        "Shield": "moon_station",
+        "Talk": "control_panel",
+        "Run": "comet_bridge"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Shield": "🛡️ Shield — Visit Moon Station safely",
+        "Talk": "💬 Talk — Check the blinking control panel",
+        "Run": "🏃 Run — Speed toward the Comet Bridge"
+      }
+    },
+    {
+      "id": "control_panel",
+      "title": "The Blinking Button",
+      "text": "The panel says: “Navigation unstable.” Robo-Bip suggests turning the silver dial slowly, not quickly.",
+      "image": "assets/images/space/control_panel.png",
+      "choices": {
+        "Talk": "moon_station",
+        "Magic": "comet_bridge"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Navigation Fixed"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Navigate carefully to Moon Station",
+        "Magic": "✨ Magic — Steer toward the Comet Bridge"
+      }
+    },
+    {
+      "id": "moon_station",
+      "title": "Moon Station",
+      "text": "At Moon Station, moon rabbits bounce in slow motion. Their telescope is stuck, and without it, they cannot point to the Sky Garden.",
+      "image": "assets/images/space/moon_station.png",
+      "choices": {
+        "Talk": "moon_rabbits",
+        "Key": "fix_telescope",
+        "Run": "comet_bridge"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Meet the moon rabbits",
+        "Key": "🗝️ Key — Fix the stuck telescope",
+        "Run": "🏃 Run — Fly to the Comet Bridge"
+      }
+    },
+    {
+      "id": "moon_rabbits",
+      "title": "Moon Rabbits",
+      "text": "The moon rabbits offer Nova a Moon Carrot and say, “Kind travelers always find shorter paths.”",
+      "image": "assets/images/space/moon_rabbits.png",
+      "choices": {
+        "Key": "fix_telescope",
+        "Run": "comet_bridge"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Moon Carrot"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Key": "🗝️ Key — Repair the telescope",
+        "Run": "🏃 Run — Continue to the Comet Bridge"
+      }
+    },
+    {
+      "id": "fix_telescope",
+      "title": "Fixing the Telescope",
+      "text": "Nova uses the Rocket Key as a tiny screwdriver. The telescope turns toward a bridge made of comet dust.",
+      "image": "assets/images/space/telescope.png",
+      "choices": {
+        "Run": "comet_bridge",
+        "Magic": "planet_colors"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Cross the Comet Bridge",
+        "Magic": "✨ Magic — Visit the Planet of Colors"
+      }
+    },
+    {
+      "id": "comet_bridge",
+      "title": "The Comet Bridge",
+      "text": "The bridge sparkles but breaks apart whenever the rocket moves too fast. Nova must choose carefully.",
+      "image": "assets/images/space/comet_bridge.png",
+      "choices": {
+        "Shield": "slow_crossing",
+        "Run": "meteor_mist",
+        "Magic": "planet_colors"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Shield": "🛡️ Shield — Cross slowly and safely",
+        "Run": "🏃 Run — Speed through the meteor mist",
+        "Magic": "✨ Magic — Fly to the Planet of Colors"
+      }
+    },
+    {
+      "id": "slow_crossing",
+      "title": "Slow and Steady",
+      "text": "Nova slows the rocket and uses the shield field. The comet dust becomes solid under the rocket.",
+      "image": "assets/images/space/slow_crossing.png",
+      "choices": {
+        "Run": "planet_colors"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Comet Dust"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Continue to the Planet of Colors"
+      }
+    },
+    {
+      "id": "meteor_mist",
+      "title": "Meteor Mist",
+      "text": "Nova speeds ahead and enters a mist of tiny meteors. The rocket shakes, and Robo-Bip drops a bolt.",
+      "image": "assets/images/space/meteor_mist.png",
+      "choices": {
+        "Run": "planet_colors",
+        "Talk": "color_creatures"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Push on to the Planet of Colors",
+        "Talk": "💬 Talk — Befriend the color creatures"
+      }
+    },
+    {
+      "id": "planet_colors",
+      "title": "The Planet of Colors",
+      "text": "The planet is covered in singing flowers. Each color makes a different sound. Stella says the Sky Garden gate needs a friendly song.",
+      "image": "assets/images/space/planet_colors.png",
+      "choices": {
+        "Talk": "color_creatures",
+        "Magic": "color_song",
+        "Run": "sky_gate"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Meet the rainbow creatures",
+        "Magic": "✨ Magic — Sing the friendly song",
+        "Run": "🏃 Run — Fly straight to the Sky Garden gate"
+      }
+    },
+    {
+      "id": "color_creatures",
+      "title": "The Color Creatures",
+      "text": "Small rainbow creatures gather around Nova. They are shy, but they smile when Nova offers the Moon Carrot.",
+      "image": "assets/images/space/color_creatures.png",
+      "choices": {
+        "Magic": "color_song",
+        "Run": "sky_gate"
+      },
+      "required_items": [
+        "Moon Carrot"
+      ],
+      "gained_items": [
+        "Rainbow Friend"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Magic": "✨ Magic — Sing with the rainbow creatures",
+        "Run": "🏃 Run — Head to the Sky Garden gate"
+      }
+    },
+    {
+      "id": "color_song",
+      "title": "The Friendly Song",
+      "text": "Nova, Stella, Robo-Bip, and the rainbow creatures sing together. A path of light appears, pointing to the Sky Garden.",
+      "image": "assets/images/space/color_song.png",
+      "choices": {
+        "Open Door": "sky_gate",
+        "Run": "sky_gate"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Friendly Song"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Open Door": "🚪 Open Door — Open the Sky Garden gate",
+        "Run": "🏃 Run — Fly to the shining gate"
+      }
+    },
+    {
+      "id": "sky_gate",
+      "title": "The Sky Garden Gate",
+      "text": "A huge silver gate floats between the stars. It opens only when a traveler brings light, kindness, and a song.",
+      "image": "assets/images/space/sky_gate.png",
+      "choices": {
+        "Open Door": "golden_space_ending",
+        "Magic": "bright_space_ending",
+        "Run": "soft_space_ending"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Open Door": "🚪 Open Door — Open the gate with song and kindness",
+        "Magic": "✨ Magic — Light the gate with star magic",
+        "Run": "🏃 Run — Rest and try again tomorrow"
+      }
+    },
+    {
+      "id": "golden_space_ending",
+      "title": "Golden Ending",
+      "text": "The gate opens wide. Stella joins thousands of happy stars in the Sky Garden. Nova receives a tiny star badge and returns home before breakfast.",
+      "image": "assets/images/space/victory.png",
+      "choices": {},
+      "required_items": [
+        "Friendly Song"
+      ],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": true
+    },
+    {
+      "id": "bright_space_ending",
+      "title": "Bright Ending",
+      "text": "Nova’s kindness lights the gate, but the song is missing. Stella reaches the garden with help from Robo-Bip’s signal.",
+      "image": "assets/images/space/bright_ending.png",
+      "choices": {},
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": true
+    },
+    {
+      "id": "soft_space_ending",
+      "title": "Soft Ending",
+      "text": "Nova is too tired to open the gate. Stella rests in the rocket’s lantern, and they promise to try again tomorrow.",
+      "image": "assets/images/space/soft_ending.png",
+      "choices": {},
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": true
+    }
+  ]
+}

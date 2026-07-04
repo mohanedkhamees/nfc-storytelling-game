@@ -1,4 +1,4 @@
-# Project Report — Tangible NFC Interactive Storytelling Game
+# Project Report — Tangible NFC Interactive Storybook for Children
 
 **Course:** Natural User Interfaces (NUI)  
 **Project:** Offline tangible-interaction storytelling game  
@@ -18,7 +18,7 @@ This project delivers a fully functional **offline tangible storytelling game** 
    - Branching story engine with inventory gating
    - Tkinter dark-mode GUI (display-only, no gameplay buttons)
    - Asset manager with Pillow image caching and placeholders
-3. **Three complete stories** — Fantasy, Mystery, and Space with multiple scenes, inventory mechanics, and endings
+3. **Three complete children's stories** — Benny and the Lost Crystal, Mina and the Missing Moon Lantern, and Nova and the Friendly Star with multiple scenes, inventory mechanics, and endings
 4. **42 scene images** across genre subfolders under `assets/images/`
 5. **Interactive card registration CLI** (`register_cards.py`) with backup and validation
 6. **35 automated unit tests** covering core modules

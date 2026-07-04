@@ -1,0 +1,402 @@
+{
+  "id": "mina",
+  "title": "Mina and the Missing Moon Lantern",
+  "start_scene": "school_yard",
+  "scenes": [
+    {
+      "id": "school_yard",
+      "title": "The Schoolyard Search",
+      "text": "At Moonbell School, everyone waits for the Moon Lantern Festival. But the special lantern has disappeared. Mina notices tiny silver footprints near the garden gate.",
+      "image": "assets/images/mystery/school_yard.png",
+      "choices": {
+        "Talk": "teacher",
+        "Hide": "garden_gate",
+        "Key": "lost_and_found"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Ask Teacher Nora for clues",
+        "Hide": "🙈 Hide — Sneak to the garden gate",
+        "Key": "🗝️ Key — Check the lost and found box"
+      }
+    },
+    {
+      "id": "teacher",
+      "title": "Teacher Nora’s Clue",
+      "text": "Teacher Nora says, “The lantern was last seen in the library. A good detective listens before accusing.” Mina writes this in her notebook.",
+      "image": "assets/images/mystery/teacher.png",
+      "choices": {
+        "Run": "library",
+        "Talk": "classmates"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Notebook"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Search the library",
+        "Talk": "💬 Talk — Question your classmates"
+      }
+    },
+    {
+      "id": "classmates",
+      "title": "The Whispering Classmates",
+      "text": "One child saw a blue feather. Another heard a squeaky cart. A third saw light near the old theater room.",
+      "image": "assets/images/mystery/classroom.png",
+      "choices": {
+        "Run": "library",
+        "Talk": "janitor",
+        "Hide": "theater_hall"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Blue Feather Clue"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Go to the library",
+        "Talk": "💬 Talk — Ask Mr. Bell the janitor",
+        "Hide": "🙈 Hide — Slip into the theater hall"
+      }
+    },
+    {
+      "id": "lost_and_found",
+      "title": "The Lost and Found Box",
+      "text": "Inside the lost and found box, Mina discovers a tiny brass key and a ribbon with glitter on it.",
+      "image": "assets/images/mystery/lost_found.png",
+      "choices": {
+        "Key": "library",
+        "Run": "garden_gate"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Brass Key",
+        "Glitter Ribbon"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Key": "🗝️ Key — Try the brass key in the library",
+        "Run": "🏃 Run — Follow the trail to the garden"
+      }
+    },
+    {
+      "id": "garden_gate",
+      "title": "The Garden Gate",
+      "text": "The garden gate is open. A path of silver dust leads toward the greenhouse. Mina hears something rustle behind the flowers.",
+      "image": "assets/images/mystery/garden.png",
+      "choices": {
+        "Talk": "little_mouse",
+        "Hide": "watch_garden",
+        "Run": "greenhouse"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Greet Pip the little mouse",
+        "Hide": "🙈 Hide — Watch quietly in the garden",
+        "Run": "🏃 Run — Enter the greenhouse"
+      }
+    },
+    {
+      "id": "watch_garden",
+      "title": "Watching Quietly",
+      "text": "Mina waits quietly. A tiny mouse appears, pulling a piece of shiny ribbon. It runs toward the greenhouse.",
+      "image": "assets/images/mystery/watch_garden.png",
+      "choices": {
+        "Talk": "little_mouse",
+        "Run": "greenhouse"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Follow Pip the mouse",
+        "Run": "🏃 Run — Go straight to the greenhouse"
+      }
+    },
+    {
+      "id": "little_mouse",
+      "title": "Pip the Mouse",
+      "text": "Mina kneels and whispers, “I won’t hurt you.” The mouse points at the greenhouse and squeaks three times.",
+      "image": "assets/images/mystery/mouse.png",
+      "choices": {
+        "Run": "greenhouse",
+        "Talk": "janitor"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Mouse Trust"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Follow Pip to the greenhouse",
+        "Talk": "💬 Talk — Ask Mr. Bell about his cart"
+      }
+    },
+    {
+      "id": "janitor",
+      "title": "Mr. Bell’s Cart",
+      "text": "Mr. Bell shows Mina his squeaky cart. “I moved chairs to the theater, but I never touched the lantern.” Mina sees silver dust on the wheel.",
+      "image": "assets/images/mystery/janitor.png",
+      "choices": {
+        "Run": "theater_hall",
+        "Talk": "greenhouse"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Cart Dust Clue"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Investigate the theater hall",
+        "Talk": "💬 Talk — Visit the greenhouse next"
+      }
+    },
+    {
+      "id": "library",
+      "title": "The Quiet Library",
+      "text": "The library smells like paper and cinnamon. The lantern’s empty hook hangs by the window. A locked drawer sits under the librarian’s desk.",
+      "image": "assets/images/mystery/library.png",
+      "choices": {
+        "Key": "locked_drawer",
+        "Talk": "librarian",
+        "Run": "theater_hall"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Key": "🗝️ Key — Open the locked drawer",
+        "Talk": "💬 Talk — Ask the librarian",
+        "Run": "🏃 Run — Check the theater hall"
+      }
+    },
+    {
+      "id": "librarian",
+      "title": "The Librarian’s Memory",
+      "text": "The librarian remembers a student carrying art supplies near the theater. “The lantern was glowing faintly, like it wanted to follow someone.”",
+      "image": "assets/images/mystery/librarian.png",
+      "choices": {
+        "Run": "theater_hall",
+        "Key": "locked_drawer"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Search the theater hall",
+        "Key": "🗝️ Key — Try the locked drawer"
+      }
+    },
+    {
+      "id": "locked_drawer",
+      "title": "The Locked Drawer",
+      "text": "The brass key opens the drawer. Inside is a festival schedule and a note: “Lantern light reacts to kindness.”",
+      "image": "assets/images/mystery/drawer.png",
+      "choices": {
+        "Run": "theater_hall",
+        "Talk": "teacher"
+      },
+      "required_items": [
+        "Brass Key"
+      ],
+      "gained_items": [
+        "Lantern Note"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Go to the theater hall",
+        "Talk": "💬 Talk — Tell Teacher Nora what you found"
+      }
+    },
+    {
+      "id": "greenhouse",
+      "title": "The Greenhouse",
+      "text": "In the greenhouse, moonflowers bloom early. Their petals glow with the same silver dust found on the cart.",
+      "image": "assets/images/mystery/greenhouse.png",
+      "choices": {
+        "Run": "theater_hall",
+        "Talk": "little_mouse"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Moonflower Dust"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Head to the theater hall",
+        "Talk": "💬 Talk — Follow Pip the mouse again"
+      }
+    },
+    {
+      "id": "theater_hall",
+      "title": "The Old Theater Hall",
+      "text": "The theater hall is dark except for a soft glow behind the stage curtain. Mina hears whispering and a small hiccup.",
+      "image": "assets/images/mystery/theater.png",
+      "choices": {
+        "Hide": "behind_curtain",
+        "Talk": "call_out",
+        "Sword": "accuse_janitor"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Hide": "🙈 Hide — Peek behind the curtain",
+        "Talk": "💬 Talk — Call out with a gentle voice",
+        "Sword": "⚔️ Sword — Accuse Mr. Bell too quickly"
+      }
+    },
+    {
+      "id": "accuse_janitor",
+      "title": "A Wrong Accusation",
+      "text": "Mina points at Mr. Bell too quickly. Everyone becomes quiet. Mina realizes detectives must use evidence, not guesses.",
+      "image": "assets/images/mystery/wrong_accuse.png",
+      "choices": {
+        "Talk": "apologize",
+        "Hide": "behind_curtain"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Apologize to Mr. Bell",
+        "Hide": "🙈 Hide — Look behind the curtain"
+      }
+    },
+    {
+      "id": "apologize",
+      "title": "A Detective Apologizes",
+      "text": "Mina apologizes. Mr. Bell smiles gently. “That is how real detectives learn.” He helps her check behind the curtain.",
+      "image": "assets/images/mystery/apology.png",
+      "choices": {
+        "Hide": "behind_curtain"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Hide": "🙈 Hide — Peek behind the stage curtain"
+      }
+    },
+    {
+      "id": "call_out",
+      "title": "A Gentle Voice",
+      "text": "Mina says, “Whoever is there, I can help.” A small voice replies, “I only wanted to fix it before anyone noticed.”",
+      "image": "assets/images/mystery/voice.png",
+      "choices": {
+        "Talk": "behind_curtain",
+        "Hide": "behind_curtain"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Step out and offer help",
+        "Hide": "🙈 Hide — Sneak behind the curtain"
+      }
+    },
+    {
+      "id": "behind_curtain",
+      "title": "Behind the Curtain",
+      "text": "Behind the curtain sits Lio, the shyest student in class. The Moon Lantern is beside him, cracked but still glowing.",
+      "image": "assets/images/mystery/curtain.png",
+      "choices": {
+        "Talk": "comfort_lio",
+        "Magic": "repair_lantern",
+        "Run": "teacher"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Comfort shy Lio",
+        "Magic": "✨ Magic — Repair the Moon Lantern",
+        "Run": "🏃 Run — Fetch Teacher Nora"
+      }
+    },
+    {
+      "id": "comfort_lio",
+      "title": "Comforting Lio",
+      "text": "Mina tells Lio, “Mistakes become smaller when we tell the truth.” Lio nods and offers the missing glass star from his pocket.",
+      "image": "assets/images/mystery/lio.png",
+      "choices": {
+        "Magic": "repair_lantern",
+        "Talk": "teacher"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Glass Star"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Magic": "✨ Magic — Fix the lantern with the glass star",
+        "Talk": "💬 Talk — Bring Teacher Nora to help"
+      }
+    },
+    {
+      "id": "repair_lantern",
+      "title": "Repairing the Lantern",
+      "text": "Mina uses the glass star and the glitter ribbon to repair the lantern. The moonflowers glow, and the lantern shines brighter than ever.",
+      "image": "assets/images/mystery/repair.png",
+      "choices": {
+        "Open Door": "festival_ending",
+        "Talk": "truth_ending"
+      },
+      "required_items": [
+        "Glass Star"
+      ],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Open Door": "🚪 Open Door — Start the festival together",
+        "Talk": "💬 Talk — Encourage Lio to tell the truth"
+      }
+    },
+    {
+      "id": "festival_ending",
+      "title": "Golden Ending",
+      "text": "Mina helps Lio explain everything. The class forgives him, and together they hang the Moon Lantern. The festival begins under silver light.",
+      "image": "assets/images/mystery/festival.png",
+      "choices": {},
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": true
+    },
+    {
+      "id": "truth_ending",
+      "title": "Kind Ending",
+      "text": "Lio tells the truth before the lantern is fully fixed. The class repairs it together. The festival starts late, but everyone feels proud.",
+      "image": "assets/images/mystery/truth_ending.png",
+      "choices": {},
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": true
+    }
+  ]
+}

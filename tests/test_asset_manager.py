@@ -15,14 +15,14 @@ from asset_manager import (
 
 
 def test_infer_story_type_from_path() -> None:
-    assert infer_story_type("assets/images/fantasy/castle.png") == "Fantasy"
-    assert infer_story_type("assets/images/mystery/foyer.png") == "Mystery"
-    assert infer_story_type("assets/images/space/bridge.png") == "Space"
+    assert infer_story_type("assets/images/fantasy/castle.png") == "Benny"
+    assert infer_story_type("assets/images/mystery/foyer.png") == "Mina"
+    assert infer_story_type("assets/images/space/bridge.png") == "Nova"
     assert infer_story_type("other/path.png") is None
 
 
 def test_create_placeholder_pil_image_size() -> None:
-    image = create_placeholder_pil_image((200, 150), scene_hint="Fantasy")
+    image = create_placeholder_pil_image((200, 150), scene_hint="Benny")
     assert image.size == (200, 150)
 
 

@@ -1,0 +1,552 @@
+{
+  "id": "benny",
+  "title": "Benny and the Lost Crystal",
+  "start_scene": "bunny_home",
+  "scenes": [
+    {
+      "id": "bunny_home",
+      "title": "Benny’s Morning",
+      "text": "Benny the little rabbit wakes up under the old oak tree. A silver bell rings across the forest. On his door he finds a note: “The Forest Crystal is missing.” Benny takes a deep breath. This is his chance to be brave.",
+      "image": "assets/images/fantasy/bunny_home.png",
+      "choices": {
+        "Talk": "grandma_rabbit",
+        "Run": "forest_path",
+        "Key": "locked_box"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Ask Grandma Rabbit for help",
+        "Run": "🏃 Run — Head into the whispering forest",
+        "Key": "🗝️ Key — Open the little wooden box"
+      }
+    },
+    {
+      "id": "grandma_rabbit",
+      "title": "Grandma’s Advice",
+      "text": "Grandma Rabbit says, “Bravery does not mean you are never afraid. It means you help even when your paws shake.” She gives Benny an old map.",
+      "image": "assets/images/fantasy/grandma.png",
+      "choices": {
+        "Magic": "wise_tree",
+        "Run": "forest_path",
+        "Shield": "take_leaf_shield"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Map"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Magic": "✨ Magic — Visit the Wise Tree",
+        "Run": "🏃 Run — Take the forest path",
+        "Shield": "🛡️ Shield — Ask for a leaf shield"
+      }
+    },
+    {
+      "id": "locked_box",
+      "title": "The Little Wooden Box",
+      "text": "Benny finds a little wooden box near his bed. It has a golden lock shaped like a star.",
+      "image": "assets/images/fantasy/box.png",
+      "choices": {
+        "Key": "golden_key",
+        "Run": "forest_path"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Key": "🗝️ Key — Try to open the golden lock",
+        "Run": "🏃 Run — Leave for the forest"
+      }
+    },
+    {
+      "id": "golden_key",
+      "title": "The Hidden Golden Key",
+      "text": "The key opens the box. Inside, Benny finds a Golden Key and a note: “This opens what fear keeps closed.”",
+      "image": "assets/images/fantasy/key.png",
+      "choices": {
+        "Run": "forest_path",
+        "Talk": "grandma_rabbit"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Golden Key"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Follow the forest path",
+        "Talk": "💬 Talk — Show Grandma the key"
+      }
+    },
+    {
+      "id": "take_leaf_shield",
+      "title": "The Leaf Shield",
+      "text": "Grandma gives Benny a strong shield made from a giant moonleaf. It shines whenever danger is near.",
+      "image": "assets/images/fantasy/leaf_shield.png",
+      "choices": {
+        "Run": "forest_path",
+        "Magic": "wise_tree"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Leaf Shield"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Enter the forest with the shield",
+        "Magic": "✨ Magic — Visit the Wise Tree"
+      }
+    },
+    {
+      "id": "forest_path",
+      "title": "The Whispering Forest",
+      "text": "Benny enters the forest. Glowing butterflies guide the path. Suddenly, he hears a squirrel crying for help from a thorn bush.",
+      "image": "assets/images/fantasy/forest.png",
+      "choices": {
+        "Talk": "squirrel_help",
+        "Sword": "cut_thorns",
+        "Hide": "ignore_squirrel"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Help the crying squirrel",
+        "Sword": "⚔️ Sword — Cut away the thorns",
+        "Hide": "🙈 Hide — Sneak past quietly"
+      }
+    },
+    {
+      "id": "squirrel_help",
+      "title": "Sammy the Squirrel",
+      "text": "Benny gently speaks to the squirrel. Sammy smiles and gives Benny a red apple. “A hungry friend may need this later,” he says.",
+      "image": "assets/images/fantasy/squirrel.png",
+      "choices": {
+        "Run": "broken_bridge",
+        "Magic": "wise_tree"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Apple"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Continue to the broken bridge",
+        "Magic": "✨ Magic — Ask the Wise Tree for guidance"
+      }
+    },
+    {
+      "id": "cut_thorns",
+      "title": "Careful Paws",
+      "text": "Benny uses a small wooden practice sword to move the thorns away without hurting the bush. Sammy is free and gives Benny a Feather Charm.",
+      "image": "assets/images/fantasy/thorns.png",
+      "choices": {
+        "Run": "broken_bridge",
+        "Talk": "squirrel_help"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Feather Charm"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Head to the broken bridge",
+        "Talk": "💬 Talk — Chat with Sammy the squirrel"
+      }
+    },
+    {
+      "id": "ignore_squirrel",
+      "title": "A Quiet Mistake",
+      "text": "Benny hides behind a mushroom. The forest grows colder. He continues, but he feels that bravery also means stopping to help.",
+      "image": "assets/images/fantasy/misty_path.png",
+      "choices": {
+        "Run": "broken_bridge",
+        "Talk": "squirrel_help"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Keep walking to the bridge",
+        "Talk": "💬 Talk — Go back and help the squirrel"
+      }
+    },
+    {
+      "id": "wise_tree",
+      "title": "The Wise Tree",
+      "text": "The oldest tree in the forest opens one sleepy eye. “The crystal was taken to the mountain tower,” it says. “Every path asks for kindness first.”",
+      "image": "assets/images/fantasy/wise_tree.png",
+      "choices": {
+        "Run": "broken_bridge",
+        "Magic": "glowing_mushrooms"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Tower Mark"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Follow the path to the bridge",
+        "Magic": "✨ Magic — Listen to the mushroom circle"
+      }
+    },
+    {
+      "id": "glowing_mushrooms",
+      "title": "The Mushroom Circle",
+      "text": "A circle of blue mushrooms hums a gentle song. Benny sees a vision: a lonely fox carrying the crystal, not to steal it, but to save his sick sister.",
+      "image": "assets/images/fantasy/mushrooms.png",
+      "choices": {
+        "Talk": "fox_meeting",
+        "Run": "broken_bridge"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Meet Fina the fox kindly",
+        "Run": "🏃 Run — Hurry to the broken bridge"
+      }
+    },
+    {
+      "id": "broken_bridge",
+      "title": "The Broken Bridge",
+      "text": "Benny reaches a broken bridge over a fast river. The other side leads to the mountain tower.",
+      "image": "assets/images/fantasy/bridge.png",
+      "choices": {
+        "Shield": "cross_bridge",
+        "Magic": "river_turtle",
+        "Run": "riverbank"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Shield": "🛡️ Shield — Cross the bridge safely",
+        "Magic": "✨ Magic — Call on Tilly the turtle",
+        "Run": "🏃 Run — Walk along the riverbank"
+      }
+    },
+    {
+      "id": "cross_bridge",
+      "title": "Across the Bridge",
+      "text": "Benny holds the Leaf Shield above his head. The shield catches the wind and helps him cross safely.",
+      "image": "assets/images/fantasy/cross_bridge.png",
+      "choices": {
+        "Run": "fox_meeting",
+        "Talk": "river_turtle"
+      },
+      "required_items": [
+        "Leaf Shield"
+      ],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Find Fina the fox",
+        "Talk": "💬 Talk — Thank Tilly the turtle"
+      }
+    },
+    {
+      "id": "river_turtle",
+      "title": "Tilly the Turtle",
+      "text": "A wise turtle rises from the river. “Small feet can still make great journeys,” she says, carrying Benny across.",
+      "image": "assets/images/fantasy/turtle.png",
+      "choices": {
+        "Run": "fox_meeting",
+        "Magic": "water_song"
+      },
+      "required_items": [],
+      "gained_items": [
+        "River Stone"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Meet Fina the fox",
+        "Magic": "✨ Magic — Learn the river's song"
+      }
+    },
+    {
+      "id": "riverbank",
+      "title": "The Long Riverbank",
+      "text": "Benny follows the riverbank. It is longer and darker, but he finds fox footprints in the mud.",
+      "image": "assets/images/fantasy/riverbank.png",
+      "choices": {
+        "Talk": "fox_meeting",
+        "Hide": "fox_shadow"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Approach the fox gently",
+        "Hide": "🙈 Hide — Watch the fox from the shadows"
+      }
+    },
+    {
+      "id": "water_song",
+      "title": "The River Song",
+      "text": "Benny listens to the river and learns its rhythm. The River Stone glows, and Benny understands the forest’s warnings.",
+      "image": "assets/images/fantasy/water_song.png",
+      "choices": {
+        "Run": "fox_meeting"
+      },
+      "required_items": [],
+      "gained_items": [
+        "River Song"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Follow the fox to the tower"
+      }
+    },
+    {
+      "id": "fox_shadow",
+      "title": "The Fox’s Shadow",
+      "text": "Benny hides quietly and sees a fox clutching the Forest Crystal. The fox looks scared, not evil.",
+      "image": "assets/images/fantasy/fox_shadow.png",
+      "choices": {
+        "Talk": "fox_meeting",
+        "Sword": "scare_fox"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Talk": "💬 Talk — Speak to the fox with kindness",
+        "Sword": "⚔️ Sword — Scare the fox away"
+      }
+    },
+    {
+      "id": "scare_fox",
+      "title": "The Wrong Kind of Brave",
+      "text": "Benny waves the practice sword. The fox runs away in fear. Benny realizes frightening someone is not the same as solving the problem.",
+      "image": "assets/images/fantasy/scare_fox.png",
+      "choices": {
+        "Run": "mountain_tower",
+        "Talk": "fox_meeting"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Climb to the mountain tower",
+        "Talk": "💬 Talk — Apologize and talk to Fina"
+      }
+    },
+    {
+      "id": "fox_meeting",
+      "title": "Fina the Fox",
+      "text": "Benny approaches the fox kindly. Fina says her little sister is sick. Benny understands: the forest needs the crystal, but Fina needs help too.",
+      "image": "assets/images/fantasy/fox.png",
+      "choices": {
+        "Key": "mountain_tower",
+        "Talk": "crystal_promise",
+        "Magic": "heal_sister"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Key": "🗝️ Key — Use the key at the tower",
+        "Talk": "💬 Talk — Make a promise about the crystal",
+        "Magic": "✨ Magic — Heal Fina's little sister"
+      }
+    },
+    {
+      "id": "heal_sister",
+      "title": "The Apple Gift",
+      "text": "Benny gives Fina the apple. Her little sister smiles for the first time all day. Fina says, “I will return the crystal with you.”",
+      "image": "assets/images/fantasy/fox_sister.png",
+      "choices": {
+        "Run": "mountain_tower",
+        "Talk": "crystal_promise"
+      },
+      "required_items": [
+        "Apple"
+      ],
+      "gained_items": [
+        "Fox Trust"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Climb to the mountain tower",
+        "Talk": "💬 Talk — Promise to help Fina together"
+      }
+    },
+    {
+      "id": "crystal_promise",
+      "title": "A Promise Under the Stars",
+      "text": "Benny promises Fina they will ask the Wise Tree how to heal her sister without stealing the crystal. The crystal glows brighter.",
+      "image": "assets/images/fantasy/promise.png",
+      "choices": {
+        "Run": "mountain_tower",
+        "Open Door": "locked_tower_fail"
+      },
+      "required_items": [],
+      "gained_items": [
+        "Crystal Promise"
+      ],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Run": "🏃 Run — Walk to the mountain tower",
+        "Open Door": "🚪 Open Door — Try the tower gate"
+      }
+    },
+    {
+      "id": "mountain_tower",
+      "title": "The Mountain Tower",
+      "text": "At the top of the hill stands an old tower covered in vines. The crystal’s light shines through a locked door.",
+      "image": "assets/images/fantasy/tower.png",
+      "choices": {
+        "Key": "tower_gate",
+        "Open Door": "locked_tower_fail",
+        "Magic": "vine_lift",
+        "Run": "broken_bridge"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Key": "🗝️ Key — Unlock the golden door",
+        "Open Door": "🚪 Open Door — Push the tower door",
+        "Magic": "✨ Magic — Ask the vines for help",
+        "Run": "🏃 Run — Head back toward the broken bridge"
+      }
+    },
+    {
+      "id": "locked_tower_fail",
+      "title": "The Door Will Not Open",
+      "text": "Benny pushes the tower door, but it will not move. A golden keyhole blinks like a sleepy star.",
+      "image": "assets/images/fantasy/locked_door.png",
+      "choices": {
+        "Key": "tower_gate",
+        "Magic": "vine_lift",
+        "Run": "mountain_tower"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Key": "🗝️ Key — Use the Golden Key",
+        "Magic": "✨ Magic — Ask the vines to lift you up",
+        "Run": "🏃 Run — Step back and try another way"
+      }
+    },
+    {
+      "id": "vine_lift",
+      "title": "The Helpful Vines",
+      "text": "Benny asks the vines for help. Because he listened to the forest, the vines lift him to a round window.",
+      "image": "assets/images/fantasy/vines.png",
+      "choices": {
+        "Open Door": "crystal_room",
+        "Key": "tower_gate"
+      },
+      "required_items": [
+        "River Song"
+      ],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Open Door": "🚪 Open Door — Climb in through the window",
+        "Key": "🗝️ Key — Try the golden door instead"
+      }
+    },
+    {
+      "id": "tower_gate",
+      "title": "The Golden Door",
+      "text": "The Golden Key turns softly. The tower door opens with a little song.",
+      "image": "assets/images/fantasy/tower_gate.png",
+      "choices": {
+        "Open Door": "crystal_room",
+        "Talk": "crystal_room"
+      },
+      "required_items": [
+        "Golden Key"
+      ],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Open Door": "🚪 Open Door — Enter the crystal room",
+        "Talk": "💬 Talk — Call out to the crystal"
+      }
+    },
+    {
+      "id": "crystal_room",
+      "title": "The Crystal Room",
+      "text": "The Forest Crystal is safe, but its light is weak. It needs one final act: Benny must decide what kind of hero he wants to be.",
+      "image": "assets/images/fantasy/crystal_room.png",
+      "choices": {
+        "Magic": "golden_ending",
+        "Talk": "silver_ending",
+        "Run": "lost_ending"
+      },
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": false,
+      "choice_labels": {
+        "Magic": "✨ Magic — Return the crystal with kindness",
+        "Talk": "💬 Talk — Return the crystal and talk",
+        "Run": "🏃 Run — Run home before deciding"
+      }
+    },
+    {
+      "id": "golden_ending",
+      "title": "Golden Ending",
+      "text": "Benny returns the crystal and helps Fina’s sister. The forest heals, the river sings, and every animal celebrates Benny because he was kind and brave.",
+      "image": "assets/images/fantasy/victory.png",
+      "choices": {},
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": true
+    },
+    {
+      "id": "silver_ending",
+      "title": "Silver Ending",
+      "text": "Benny returns the crystal. The stars shine again, and the animals are safe. Fina watches from far away, hoping someone will help her too.",
+      "image": "assets/images/fantasy/silver_ending.png",
+      "choices": {},
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": true
+    },
+    {
+      "id": "lost_ending",
+      "title": "Soft Ending",
+      "text": "Benny runs before understanding the crystal’s lesson. He finds his way home by sunrise and knows he must try again with a kinder heart.",
+      "image": "assets/images/fantasy/lost_ending.png",
+      "choices": {},
+      "required_items": [],
+      "gained_items": [],
+      "lost_items": [],
+      "ending": true
+    }
+  ]
+}
