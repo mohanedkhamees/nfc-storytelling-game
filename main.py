@@ -464,9 +464,13 @@ class GameApplication:
 
         if self._hardware_mode:
             self._serial_reader = SerialReader(
-                on_uid=self._on_uid,
-                on_connection_change=self._on_connection_change,
-            )
+    on_uid=self._on_uid,
+    on_connection_change=self._on_connection_change,
+    port="/dev/cu.usbmodem145101",   # أو اسم البورت الصحيح عندك
+    baud_rate=115200,
+    debounce_ms=2500,
+)
+            
         else:
             self._ui.set_debug_mode(True)
 
@@ -566,8 +570,12 @@ class GameApplication:
         )
 
     def _handle_card_scan(self, card: Card, *, source: str) -> None:
-        """Route a scanned card through the engine without restarting an active story."""
         self._ui.set_last_scanned(card.name, card.uid)
+        if card.type == CardType.STORY and self._story_engine.is_story_active():
+         self._ui.show_error("Story cards can only be used at the start.")
+         logger.info("Ignored story card during active story: %s", card.name)
+         return
+
         self._log_active_scene_choices(source=source, action_key=card.name)
         result = self._story_engine.handle_card(card)
         self._apply_engine_result(result)
@@ -699,7 +707,7 @@ class GameApplication:
     def _on_close(self) -> None:
         """Clean shutdown: stop serial thread and destroy the window."""
         if self._serial_reader is not None:
-            self._serial_reader.stop()
+            self._serial_reader.disconnect()
         self._root.destroy()
 
 

@@ -185,7 +185,7 @@ class SerialReader:
         if self._thread is not None and self._thread.is_alive():
             self._thread.join(timeout=self._reconnect_interval + _READ_TIMEOUT_SECONDS + 1.0)
 
-        self._disconnect()
+        self.disconnect()
         self._thread = None
 
     def is_connected(self) -> bool:
