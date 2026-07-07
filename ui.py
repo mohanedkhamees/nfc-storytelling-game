@@ -463,9 +463,12 @@ class _StorySceneScreen(tk.Frame):
         self._text_widget.config(state=tk.DISABLED)
         self._text_widget.yview_moveto(0.0)
 
+        """self._render_choices(available_choices, scene.choice_labels)
+        self._render_inventory(inventory)
+        self._render_image(scene.image, asset_manager)"""
+        self._render_image(scene.image, asset_manager)
         self._render_choices(available_choices, scene.choice_labels)
         self._render_inventory(inventory)
-        self._render_image(scene.image, asset_manager)
 
     def _render_choices(
         self,
@@ -540,7 +543,9 @@ class _StorySceneScreen(tk.Frame):
             self._photo = None
             self._image_label.config(image="", text="🖼️")
             return
+        self._image_label.config(image="", text="Loading…")
 
+        self._image_label.update_idletasks()
         self._photo = asset_manager.load_image(
             image_path,
             (IMAGE_MAX_WIDTH, IMAGE_MAX_HEIGHT),
@@ -789,6 +794,8 @@ class GameUI:
             available_choices: Action card names valid in this scene.
         """
         self._current_screen = "scene"
+        self._show_frame(self._scene_screen)
+
         self._scene_screen.update_content(
             story_title=story_title,
             scene=scene,
@@ -796,7 +803,6 @@ class GameUI:
             available_choices=available_choices,
             asset_manager=self._asset_manager,
         )
-        self._show_frame(self._scene_screen)
         self.set_status("Waiting for your NFC card…")
 
     def show_ending(
@@ -869,8 +875,8 @@ class GameUI:
     def _configure_root(self) -> None:
         self._root.title("Tangible NFC Interactive Storybook")
         self._root.configure(bg=COLOR_BG)
-        self._root.minsize(MIN_WIDTH, MIN_HEIGHT)
-
+        """self._root.minsize(MIN_WIDTH, MIN_HEIGHT)"""
+        self._root.attributes("-fullscreen", True)
         default_font = tkfont.nametofont("TkDefaultFont")
         default_font.configure(family=self._font_family, size=14)
         self._root.option_add("*Font", default_font)
