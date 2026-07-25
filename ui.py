@@ -38,7 +38,6 @@ PASTEL_LAVENDER = "#E8D6FF"
 PASTEL_PEACH = "#FFE0CC"
 
 PASTEL_CARD_COLORS = (PASTEL_PINK, PASTEL_YELLOW, PASTEL_GREEN, PASTEL_BLUE)
-CHOICE_PILL_COLORS = (PASTEL_PINK, PASTEL_YELLOW, PASTEL_GREEN, PASTEL_BLUE, PASTEL_LAVENDER, PASTEL_PEACH)
 
 MIN_WIDTH = 900
 MIN_HEIGHT = 600
@@ -46,26 +45,71 @@ IMAGE_MAX_WIDTH = 420
 IMAGE_MAX_HEIGHT = 320
 ERROR_DISPLAY_MS = 4000
 
-STORY_CARD_STYLES: dict[str, tuple[str, str]] = {
-    "benny": ("🐰", PASTEL_PINK),
-    "mina": ("🔍", PASTEL_YELLOW),
-    "nova": ("🚀", PASTEL_BLUE),
+# Story text never scrolls: the font shrinks within these bounds until it fits.
+STORY_FONT_MAX = 21
+STORY_FONT_MIN = 9
+ENDING_FONT_MAX = 17
+ENDING_FONT_MIN = 10
+
+# The ending screen is a single centred column, so the picture is the hero.
+# Its height is capped by whatever the surrounding text and headings leave over.
+ENDING_IMAGE_MAX_WIDTH = 620
+ENDING_IMAGE_MAX_HEIGHT = 460
+ENDING_IMAGE_MIN_HEIGHT = 180
+# Border and pack spacing above/below the picture, plus breathing room.
+ENDING_IMAGE_PADDING = 80
+
+# Single source of truth for physical card identity: name -> (emoji, colour).
+# Every card gets its OWN colour so the pill on screen matches the printed card
+# the child is looking for. Hues are spaced around the colour wheel so the 2-4
+# choices shown in any one scene are never confusable.
+CARD_STYLES: dict[str, tuple[str, str]] = {
+    "Benny": ("🐰", "#FFA3C4"),      # rose
+    "Mina": ("🔍", "#FFE785"),       # yellow
+    "Nova": ("🚀", "#8FC4F5"),       # azure
+    "Sword": ("⚔️", "#FFA8A8"),      # red
+    "Magic": ("✨", "#C4A3F5"),      # violet
+    "Shield": ("🛡️", "#8FE39A"),     # green
+    "Run": ("🏃", "#FFC48C"),        # orange
+    "Key": ("🗝️", "#C6E86B"),        # lime
+    "Talk": ("💬", "#7FDCE8"),       # cyan
+    "Hide": ("🙈", "#7FE0BE"),       # spring
+    "Open Door": ("🚪", "#EDA3E8"),  # magenta
+    "Restart": ("🔄", "#A3AEF5"),    # blue
 }
 
-DEBUG_CARD_STYLES: dict[str, tuple[str, str]] = {
-    "Benny": ("🐰", PASTEL_PINK),
-    "Mina": ("🔍", PASTEL_YELLOW),
-    "Nova": ("🚀", PASTEL_BLUE),
-    "Sword": ("⚔️", PASTEL_PEACH),
-    "Magic": ("✨", PASTEL_LAVENDER),
-    "Shield": ("🛡️", PASTEL_GREEN),
-    "Run": ("🏃", PASTEL_YELLOW),
-    "Key": ("🗝️", PASTEL_BLUE),
-    "Talk": ("💬", PASTEL_PINK),
-    "Hide": ("🙈", PASTEL_GREEN),
-    "Open Door": ("🚪", PASTEL_PEACH),
-    "Restart": ("🔄", PASTEL_LAVENDER),
+UNKNOWN_CARD_STYLE: tuple[str, str] = ("🃏", "#E4E4EF")
+
+STORY_CARD_STYLES: dict[str, tuple[str, str]] = {
+    name.casefold(): style
+    for name, style in CARD_STYLES.items()
+    if name in ("Benny", "Mina", "Nova")
 }
+
+DEBUG_CARD_STYLES: dict[str, tuple[str, str]] = CARD_STYLES
+
+
+def card_style(card_name: str) -> tuple[str, str]:
+    """Return ``(emoji, colour)`` for a card name, case-insensitively."""
+    normalized = card_name.strip().casefold()
+    for name, style in CARD_STYLES.items():
+        if name.casefold() == normalized:
+            return style
+    return UNKNOWN_CARD_STYLE
+
+
+def split_choice_label(card_name: str, label: str) -> str:
+    """Return just the description part of a ``"EMOJI Card — description"`` label.
+
+    The emoji and card name are rendered from :data:`CARD_STYLES` instead, so the
+    pill always matches the physical card even if the story JSON disagrees.
+    """
+    text = label.strip()
+    if "—" in text:
+        text = text.split("—", 1)[1]
+    elif text.casefold().startswith(card_name.casefold()):
+        text = text[len(card_name):]
+    return text.strip(" -–—:") or card_name
 
 
 def _resolve_font_family() -> str:
@@ -108,6 +152,56 @@ def _story_card_look(title: str, index: int) -> tuple[str, str]:
         if key in lowered:
             return emoji, color
     return "📖", PASTEL_CARD_COLORS[index % len(PASTEL_CARD_COLORS)]
+
+
+def _text_pixel_height(widget: tk.Text) -> int | None:
+    """Return the rendered pixel height of a Text widget's content, if measurable."""
+    try:
+        measured = widget.count("1.0", "end-1c", "ypixels")
+    except tk.TclError:
+        return None
+    if isinstance(measured, (tuple, list)):
+        measured = measured[0] if measured else None
+    return int(measured) if measured is not None else None
+
+
+def _fit_text_font(
+    widget: tk.Text,
+    family: str,
+    *,
+    max_size: int,
+    min_size: int,
+    _attempt: int = 0,
+) -> None:
+    """Shrink *widget*'s font until its text fits, so it never needs scrolling.
+
+    The widget must be stretched by its geometry manager (its own ``height``
+    request is ignored), otherwise the available height would shrink along with
+    the font and the loop would never converge.
+    """
+    widget.update_idletasks()
+    available = widget.winfo_height()
+    if available <= 1:
+        # Not laid out yet — retry a few times, then give up quietly.
+        if _attempt < 10:
+            widget.after(
+                50,
+                lambda: _fit_text_font(
+                    widget,
+                    family,
+                    max_size=max_size,
+                    min_size=min_size,
+                    _attempt=_attempt + 1,
+                ),
+            )
+        return
+
+    for size in range(max_size, min_size - 1, -1):
+        widget.configure(font=(family, size))
+        widget.update_idletasks()
+        needed = _text_pixel_height(widget)
+        if needed is None or needed <= available:
+            return
 
 
 def _rounded_frame(
@@ -367,9 +461,6 @@ class _StorySceneScreen(tk.Frame):
         text_frame.columnconfigure(0, weight=1)
         text_frame.rowconfigure(0, weight=1)
 
-        text_scroll = tk.Scrollbar(text_frame, orient=tk.VERTICAL)
-        text_scroll.grid(row=0, column=1, sticky="ns")
-
         self._text_widget = tk.Text(
             text_frame,
             wrap=tk.WORD,
@@ -380,16 +471,19 @@ class _StorySceneScreen(tk.Frame):
             highlightthickness=0,
             padx=6,
             pady=6,
-            height=10,
+            # height=1 so the grid cell decides the size, not the font: the
+            # auto-fit in _fit_text_font needs a stable available height.
+            height=1,
             state=tk.DISABLED,
             cursor="arrow",
-            yscrollcommand=text_scroll.set,
         )
         self._text_widget.grid(row=0, column=0, sticky="nsew")
-        text_scroll.config(command=self._text_widget.yview)
+        # No scrolling by any route — the text is always sized to fit instead.
+        for sequence in ("<MouseWheel>", "<Button-4>", "<Button-5>"):
+            self._text_widget.bind(sequence, lambda _event: "break")
 
         choices_frame = tk.Frame(right, bg=COLOR_BG)
-        choices_frame.grid(row=2, column=0, sticky="ew", pady=(0, 12))
+        choices_frame.grid(row=2, column=0, sticky="ew", pady=(0, 8))
 
         tk.Label(
             choices_frame,
@@ -398,16 +492,17 @@ class _StorySceneScreen(tk.Frame):
             fg=COLOR_ACCENT,
             bg=COLOR_BG,
             anchor=tk.W,
-        ).pack(anchor=tk.W, pady=(0, 10))
+        ).pack(anchor=tk.W, pady=(0, 6))
 
         self._choices_frame = tk.Frame(choices_frame, bg=COLOR_BG)
         self._choices_frame.pack(fill=tk.X)
 
+        # Backpack on a single line: every pixel saved here goes to the story text.
         inventory_outer = _rounded_frame(
             right,
             bg=PASTEL_YELLOW,
             padx=16,
-            pady=14,
+            pady=8,
             border_color=COLOR_SURFACE,
         )
         inventory_outer.grid(row=3, column=0, sticky="ew")
@@ -419,19 +514,18 @@ class _StorySceneScreen(tk.Frame):
             fg=COLOR_TEXT_DARK,
             bg=PASTEL_YELLOW,
             anchor=tk.W,
-        ).pack(anchor=tk.W, pady=(0, 6))
+        ).pack(side=tk.LEFT, padx=(0, 10))
 
         self._inventory_label = tk.Label(
             inventory_outer,
             text="(empty)",
-            font=self._fonts["body"],
+            font=self._fonts["small"],
             fg=COLOR_MUTED,
             bg=PASTEL_YELLOW,
             anchor=tk.W,
             justify=tk.LEFT,
-            wraplength=480,
         )
-        self._inventory_label.pack(anchor=tk.W)
+        self._inventory_label.pack(side=tk.LEFT)
 
     def update_content(
         self,
@@ -463,12 +557,18 @@ class _StorySceneScreen(tk.Frame):
         self._text_widget.config(state=tk.DISABLED)
         self._text_widget.yview_moveto(0.0)
 
-        """self._render_choices(available_choices, scene.choice_labels)
-        self._render_inventory(inventory)
-        self._render_image(scene.image, asset_manager)"""
         self._render_image(scene.image, asset_manager)
         self._render_choices(available_choices, scene.choice_labels)
         self._render_inventory(inventory)
+
+        # Fit last: the choices and inventory below decide how much vertical
+        # space the story text actually gets.
+        _fit_text_font(
+            self._text_widget,
+            self._fonts["story"][0],
+            max_size=STORY_FONT_MAX,
+            min_size=STORY_FONT_MIN,
+        )
 
     def _render_choices(
         self,
@@ -492,9 +592,14 @@ class _StorySceneScreen(tk.Frame):
         cards_row = tk.Frame(self._choices_frame, bg=COLOR_BG)
         cards_row.pack(fill=tk.X)
 
-        for index, choice_key in enumerate(choices):
-            card_color = CHOICE_PILL_COLORS[index % len(CHOICE_PILL_COLORS)]
-            label_text = choice_labels.get(choice_key, choice_key)
+        for choice_key in choices:
+            # Emoji and colour come from CARD_STYLES, never from the story JSON,
+            # so the pill always matches the printed card the child must find.
+            emoji, card_color = card_style(choice_key)
+            description = split_choice_label(
+                choice_key,
+                choice_labels.get(choice_key, choice_key),
+            )
             card = _rounded_frame(
                 cards_row,
                 bg=card_color,
@@ -504,33 +609,32 @@ class _StorySceneScreen(tk.Frame):
             )
             card.pack(side=tk.LEFT, padx=(0, 12), pady=4)
 
+            tk.Label(
+                card,
+                text=f"{emoji} {choice_key}",
+                font=self._fonts["choice_card"],
+                fg=COLOR_TEXT_DARK,
+                bg=card_color,
+                justify=tk.CENTER,
+            ).pack()
+
+            tk.Label(
+                card,
+                text=description,
+                font=self._fonts["small"],
+                fg=COLOR_TEXT_DARK,
+                bg=card_color,
+                justify=tk.CENTER,
+                wraplength=170,
+            ).pack(pady=(4, 0))
+
             if self._choice_clicks_enabled and self._choice_click_callback is not None:
-                tk.Button(
-                    card,
-                    text=label_text,
-                    font=self._fonts["choice_card"],
-                    fg=COLOR_TEXT_DARK,
-                    bg=card_color,
-                    activebackground=card_color,
-                    activeforeground=COLOR_TEXT_DARK,
-                    relief=tk.FLAT,
-                    highlightthickness=0,
-                    bd=0,
-                    justify=tk.CENTER,
-                    wraplength=180,
-                    cursor="hand2",
-                    command=lambda key=choice_key: self._choice_click_callback(key),
-                ).pack()
-            else:
-                tk.Label(
-                    card,
-                    text=label_text,
-                    font=self._fonts["choice_card"],
-                    fg=COLOR_TEXT_DARK,
-                    bg=card_color,
-                    justify=tk.CENTER,
-                    wraplength=180,
-                ).pack()
+                for widget in (card, *card.winfo_children()):
+                    widget.configure(cursor="hand2")
+                    widget.bind(
+                        "<Button-1>",
+                        lambda _event, key=choice_key: self._choice_click_callback(key),
+                    )
 
     def _render_inventory(self, inventory: list[str]) -> None:
         if inventory:
@@ -570,24 +674,18 @@ class _EndingScreen(tk.Frame):
 
     def _build(self) -> None:
         container = tk.Frame(self, bg=COLOR_BG_ALT)
-        container.place(relx=0.5, rely=0.45, anchor=tk.CENTER)
+        container.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        self._container = container
 
-        tk.Label(
-            container,
-            text="🎉",
-            font=(self._fonts["card_emoji"][0], 48),
-            fg=COLOR_TEXT_DARK,
-            bg=COLOR_BG_ALT,
-        ).pack(pady=(0, 4))
-
+        # Celebration and "The End" share one line so the picture gets the room.
         self._celebration_label = tk.Label(
             container,
-            text="The End 🌟",
+            text="🎉 The End 🌟",
             font=self._fonts["celebration"],
             fg=COLOR_ACCENT,
             bg=COLOR_BG_ALT,
         )
-        self._celebration_label.pack(pady=(0, 8))
+        self._celebration_label.pack(pady=(0, 4))
 
         self._title_label = tk.Label(
             container,
@@ -596,7 +694,7 @@ class _EndingScreen(tk.Frame):
             fg=COLOR_TEXT_DARK,
             bg=COLOR_BG_ALT,
         )
-        self._title_label.pack(pady=(0, 8))
+        self._title_label.pack(pady=(0, 2))
 
         self._ending_label = tk.Label(
             container,
@@ -605,30 +703,38 @@ class _EndingScreen(tk.Frame):
             fg=COLOR_MUTED,
             bg=COLOR_BG_ALT,
         )
-        self._ending_label.pack(pady=(0, 16))
+        self._ending_label.pack(pady=(0, 14))
+
+        # Picture beside the text, not above it: stacking them vertically left
+        # the picture only ~250px tall on a 864px screen.
+        row = tk.Frame(container, bg=COLOR_BG_ALT)
+        row.pack()
 
         image_wrap = _rounded_frame(
-            container,
+            row,
             bg=COLOR_PLACEHOLDER,
             padx=8,
             pady=8,
             border_color=COLOR_SURFACE,
         )
-        image_wrap.pack(pady=(0, 16))
+        image_wrap.pack(side=tk.LEFT, padx=(0, 24))
 
+        # No width/height here: on a Label those switch from character units to
+        # PIXELS as soon as an image is set, which squashed the picture to 42x16.
         self._image_label = tk.Label(
             image_wrap,
             bg=COLOR_PLACEHOLDER,
             fg=COLOR_MUTED,
             text="🖼️",
             font=self._fonts["card_emoji"],
-            width=IMAGE_MAX_WIDTH // 10,
-            height=IMAGE_MAX_HEIGHT // 20,
         )
         self._image_label.pack()
 
+        side = tk.Frame(row, bg=COLOR_BG_ALT)
+        side.pack(side=tk.LEFT)
+
         text_frame = _rounded_frame(
-            container,
+            side,
             bg=COLOR_SURFACE,
             padx=20,
             pady=16,
@@ -636,27 +742,26 @@ class _EndingScreen(tk.Frame):
         )
         text_frame.pack(pady=(0, 20))
 
-        self._text_widget = tk.Text(
+        # A Label auto-sizes to its content, so the ending text can never be
+        # clipped or need scrolling however long the ending is.
+        self._text_label = tk.Label(
             text_frame,
-            wrap=tk.WORD,
+            text="",
             font=self._fonts["body"],
             fg=COLOR_TEXT,
             bg=COLOR_SURFACE,
-            relief=tk.FLAT,
-            highlightthickness=0,
-            width=58,
-            height=5,
-            state=tk.DISABLED,
-            cursor="arrow",
+            justify=tk.LEFT,
+            wraplength=440,
         )
-        self._text_widget.pack()
+        self._text_label.pack()
 
         tk.Label(
-            container,
-            text="Scan Restart to play again! 🔄",
+            side,
+            text="Scan Restart\nto play again! 🔄",
             font=self._fonts["subtitle"],
             fg=COLOR_ACCENT,
             bg=COLOR_BG_ALT,
+            justify=tk.CENTER,
         ).pack()
 
     def update_content(
@@ -682,21 +787,49 @@ class _EndingScreen(tk.Frame):
         else:
             self._ending_label.config(text="What a wonderful adventure!")
 
-        self._text_widget.config(state=tk.NORMAL)
-        self._text_widget.delete("1.0", tk.END)
-        self._text_widget.insert(tk.END, scene.text)
-        self._text_widget.config(state=tk.DISABLED)
+        # Shrink the ending font a little for unusually long endings so the
+        # centred card still fits on screen.
+        family = self._fonts["body"][0]
+        size = ENDING_FONT_MAX if len(scene.text) <= 260 else ENDING_FONT_MIN + 2
+        self._text_label.config(text=scene.text, font=(family, size))
 
         if not scene.image:
             self._photo = None
             self._image_label.config(image="", text="🖼️")
             return
 
-        self._photo = asset_manager.load_image(
-            scene.image,
-            (IMAGE_MAX_WIDTH, IMAGE_MAX_HEIGHT),
-        )
+        self._photo = asset_manager.load_image(scene.image, self._image_box())
         self._image_label.config(image=self._photo, text="")
+
+    def _image_box(self) -> tuple[int, int]:
+        """Return the largest picture size that still leaves room for the text.
+
+        The headings and ending text are already rendered when this runs, so the
+        space they need is *measured* rather than estimated: the picture is
+        emptied, the column is re-measured, and whatever is left is the budget.
+        """
+        self.update_idletasks()
+        # This frame may not be mapped yet (update_content runs before the screen
+        # is raised), so fall back to the parent container's height.
+        available = max(self.winfo_height(), self.master.winfo_height())
+        if available <= 1:
+            return (ENDING_IMAGE_MAX_WIDTH, ENDING_IMAGE_MAX_HEIGHT)
+
+        # Only the headings stack above the picture — the ending text sits beside
+        # it — so they are the only thing competing for vertical space. Requested
+        # heights are used because they are correct before the screen is mapped.
+        header = sum(
+            label.winfo_reqheight()
+            for label in (
+                self._celebration_label,
+                self._title_label,
+                self._ending_label,
+            )
+        )
+
+        budget = available - header - ENDING_IMAGE_PADDING
+        height = min(ENDING_IMAGE_MAX_HEIGHT, max(ENDING_IMAGE_MIN_HEIGHT, budget))
+        return (ENDING_IMAGE_MAX_WIDTH, height)
 
 
 class GameUI:
@@ -877,6 +1010,9 @@ class GameUI:
         self._root.configure(bg=COLOR_BG)
         """self._root.minsize(MIN_WIDTH, MIN_HEIGHT)"""
         self._root.attributes("-fullscreen", True)
+        # Escape hatch: fullscreen with no window controls otherwise traps the user.
+        self._root.bind("<Escape>", lambda _event: self._root.attributes("-fullscreen", False))
+        self._root.bind("<F11>", lambda _event: self._root.attributes("-fullscreen", True))
         default_font = tkfont.nametofont("TkDefaultFont")
         default_font.configure(family=self._font_family, size=14)
         self._root.option_add("*Font", default_font)
@@ -986,13 +1122,13 @@ class GameUI:
         buttons_frame.pack(fill=tk.X, padx=6, pady=(4, 2))
 
         for index, name in enumerate(debug_cards):
-            emoji, card_color = DEBUG_CARD_STYLES.get(name, ("🃏", PASTEL_LAVENDER))
+            emoji, card_color = card_style(name)
             label = f"{key_labels[index]}{emoji}"
             tk.Button(
                 buttons_frame,
                 text=label,
                 font=self._fonts["debug"],
-                fg=COLOR_MUTED,
+                fg=COLOR_TEXT_DARK,
                 bg=card_color,
                 activebackground=card_color,
                 activeforeground=COLOR_TEXT_DARK,

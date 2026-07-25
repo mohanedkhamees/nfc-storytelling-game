@@ -241,11 +241,12 @@ def test_choice_labels_loaded_from_production_stories() -> None:
     benny = loader.load_story("benny")
     home = benny.get_scene("bunny_home")
     assert home is not None
-    assert home.choice_labels == {
-        "Talk": "💬 Talk — Ask Grandma Rabbit for help",
-        "Run": "🏃 Run — Head into the whispering forest",
-        "Key": "🗝️ Key — Open the little wooden box",
-    }
+    assert set(home.choice_labels) == {"Talk", "Run", "Key"}
+    # Labels are display copy and change freely; the contract is that each one
+    # names its NFC card so the child can find the matching physical card.
+    for action_name, label in home.choice_labels.items():
+        assert action_name in label, f"label for {action_name!r} must name the card"
+        assert "—" in label, f"label for {action_name!r} must explain the choice"
     for scene in benny.scenes.values():
         if scene.choices:
             assert set(scene.choice_labels.keys()) == set(scene.choices.keys())

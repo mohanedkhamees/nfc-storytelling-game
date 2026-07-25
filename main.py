@@ -408,12 +408,14 @@ class GameApplication:
         *,
         hardware_mode: bool = True,
         debug: bool = False,
+        port: str | None = None,
     ) -> None:
         """Initialize all subsystems and wire event callbacks.
 
         Args:
             hardware_mode: When True, start :class:`SerialReader` for NFC input.
             debug: When True, enable the UI debug panel for simulated scans.
+            port: Explicit serial device (e.g. ``COM3``); auto-detected when None.
         """
         import tkinter as tk
 
@@ -464,13 +466,12 @@ class GameApplication:
 
         if self._hardware_mode:
             self._serial_reader = SerialReader(
-    on_uid=self._on_uid,
-    on_connection_change=self._on_connection_change,
-    port="/dev/cu.usbmodem145101",   # أو اسم البورت الصحيح عندك
-    baud_rate=115200,
-    debounce_ms=2500,
-)
-            
+                on_uid=self._on_uid,
+                on_connection_change=self._on_connection_change,
+                port=port,  # None → auto-detect; override with --port
+                baud_rate=115200,
+                debounce_ms=2500,
+            )
         else:
             self._ui.set_debug_mode(True)
 
@@ -572,9 +573,9 @@ class GameApplication:
     def _handle_card_scan(self, card: Card, *, source: str) -> None:
         self._ui.set_last_scanned(card.name, card.uid)
         if card.type == CardType.STORY and self._story_engine.is_story_active():
-         self._ui.show_error("Story cards can only be used at the start.")
-         logger.info("Ignored story card during active story: %s", card.name)
-         return
+            self._ui.show_error("Story cards can only be used at the start.")
+            logger.info("Ignored story card during active story: %s", card.name)
+            return
 
         self._log_active_scene_choices(source=source, action_key=card.name)
         result = self._story_engine.handle_card(card)
@@ -711,7 +712,7 @@ class GameApplication:
         self._root.destroy()
 
 
-def run_gui(*, hardware_mode: bool, debug: bool) -> None:
+def run_gui(*, hardware_mode: bool, debug: bool, port: str | None = None) -> None:
     """Launch the Tkinter GUI with safe initialization on macOS."""
     configure_logging(debug=debug)
 
@@ -724,7 +725,7 @@ def run_gui(*, hardware_mode: bool, debug: bool) -> None:
 
     try:
         logger.info("Initializing GUI application...")
-        app = GameApplication(hardware_mode=hardware_mode, debug=debug)
+        app = GameApplication(hardware_mode=hardware_mode, debug=debug, port=port)
         app.run()
     except Exception as exc:
         logger.exception("GUI failed to start")
@@ -744,12 +745,22 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "  python3 main.py --hardware   # explicit hardware mode\n"
             "  python3 main.py --debug      # simulate cards without Arduino\n"
             "  python3 main.py --debug --cli  # terminal mode (no Tkinter)\n"
+            "  python3 main.py --port COM3  # force a specific serial port\n"
         ),
     )
     parser.add_argument(
         "--cli",
         action="store_true",
         help="Run in terminal mode without Tkinter (no GUI, no Arduino)",
+    )
+    parser.add_argument(
+        "--port",
+        default=None,
+        metavar="DEVICE",
+        help=(
+            "Serial port of the Arduino (e.g. COM3, /dev/ttyACM0, "
+            "/dev/cu.usbmodem14101). Auto-detected when omitted."
+        ),
     )
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument(
@@ -774,7 +785,7 @@ def main(argv: list[str] | None = None) -> None:
     if args.cli:
         run_cli(debug=debug)
     else:
-        run_gui(hardware_mode=hardware_mode, debug=debug)
+        run_gui(hardware_mode=hardware_mode, debug=debug, port=args.port)
 
 
 if __name__ == "__main__":

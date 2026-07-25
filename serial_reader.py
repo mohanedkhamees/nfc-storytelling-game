@@ -46,6 +46,7 @@ _PORT_KEYWORDS = (
     "usb serial",
     "acm",
     "usbserial",
+    "usbmodem",
     "wch",
     "cp210",
     "ftdi",
