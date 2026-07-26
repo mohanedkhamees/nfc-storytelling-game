@@ -180,15 +180,18 @@ def test_collect_story_entries_maps_titles_to_card_names():
     ]
 
 
-def test_registry_story_cards_on_shared_engine_switch_stories():
-    """Regression: sequential Benny/Mina/Nova scans must not all stay on Benny."""
+def test_each_registry_story_card_starts_its_own_story():
+    """Regression: Benny/Mina/Nova must each resolve to their own story, not all to Benny.
+
+    Each card is scanned on a fresh engine because a story card is refused while
+    another story is already running.
+    """
     from card_manager import CardManager
     from main import find_card_by_name, init_story_loader
     from story_engine import EngineOutcome, StoryEngine
 
     card_manager = CardManager(PROJECT_ROOT / "data" / "cards.json")
     story_loader, _, _ = init_story_loader()
-    engine = StoryEngine(story_loader)
 
     expected = (
         ("Benny", "benny", "bunny_home"),
@@ -196,6 +199,7 @@ def test_registry_story_cards_on_shared_engine_switch_stories():
         ("Nova", "nova", "bedroom"),
     )
     for card_name, story_id, start_scene in expected:
+        engine = StoryEngine(story_loader)
         card = find_card_by_name(card_manager, card_name)
         assert card is not None
         result = engine.handle_card(card)
@@ -205,8 +209,8 @@ def test_registry_story_cards_on_shared_engine_switch_stories():
         assert engine.get_current_scene().id == start_scene
 
 
-def test_simulate_path_mina_after_benny_does_not_stay_on_benny():
-    """App simulate path: scanning Mina after Benny must switch to Mina's story."""
+def test_simulate_path_mina_during_benny_is_refused():
+    """App simulate path: scanning Mina while Benny is running must change nothing."""
     from card_manager import CardManager
     from main import GameApplication, init_story_loader
     from story_engine import EngineOutcome, StoryEngine
@@ -246,12 +250,12 @@ def test_simulate_path_mina_after_benny_does_not_stay_on_benny():
 
     app._simulate_card_by_name("Benny")
     assert engine.get_state().story_id == "benny"
+    scene_before = engine.get_current_scene().id
 
     app._simulate_card_by_name("Mina")
-    assert engine.get_state().story_id == "mina"
-    assert engine.get_state().story_id != "benny"
+    assert engine.get_state().story_id == "benny"
     assert engine.get_current_scene() is not None
-    assert engine.get_current_scene().id == "school_yard"
+    assert engine.get_current_scene().id == scene_before
 
 
 def test_resolve_card_for_action_uses_registry_card_type():

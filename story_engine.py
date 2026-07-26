@@ -295,10 +295,13 @@ class StoryEngine:
     def _handle_story_card(self, card: Card) -> EngineResult:
         """Start a story matching the story card name.
 
-        Re-scanning the story that is already loaded is always ignored — during
-        play so progress is not lost, and on the ending screen so a card left
-        lying near the reader cannot silently restart the story. Only the Restart
-        card replays a finished story. Scanning a *different* story card switches.
+        Story cards only choose a story; they never change one that is running.
+
+        * While a story is in progress, **every** story card is refused, so a child
+          cannot lose their progress by picking up the wrong card — and a card left
+          lying near the reader cannot silently restart or switch the story.
+        * On the ending screen, re-scanning the same story points at Restart, while
+          a different story card starts that story: the natural "pick a new one" moment.
         """
         story = self._find_story_for_card(card.name)
         if story is None:
@@ -307,31 +310,29 @@ class StoryEngine:
                 message=f"No story matches card name {card.name!r}.",
             )
 
-        if self.is_story_active() and self._state.story_id == story.id:
+        if self.is_story_active() and not self._state.is_ended:
             logger.info(
-                "Story card ignored: story=%s scene=%s ended=%s card=%r",
+                "Story card refused mid-story: story=%s scene=%s card=%r",
                 self._state.story_id,
                 self._state.scene_id,
-                self._state.is_ended,
                 card.name,
             )
-            if self._state.is_ended:
-                return EngineResult(
-                    outcome=EngineOutcome.STORY_ALREADY_ENDED,
-                    message="Story has ended. Scan Restart to play again.",
-                    story_id=self._state.story_id,
-                    new_scene_id=self._state.scene_id,
-                    ending_id=self._state.ending_id,
-                    inventory=tuple(self._state.inventory.items),
-                )
             return EngineResult(
-                outcome=EngineOutcome.STORY_ALREADY_ACTIVE,
-                message=(
-                    f"Story already in progress ({self._state.story_id!r}). "
-                    "Scan action cards or Restart to play again."
-                ),
+                outcome=EngineOutcome.INVALID_ACTION,
+                message=INVALID_CHOICE_MESSAGE,
                 story_id=self._state.story_id,
                 new_scene_id=self._state.scene_id,
+                inventory=tuple(self._state.inventory.items),
+            )
+
+        if self.is_story_active() and self._state.story_id == story.id:
+            logger.info("Story card ignored at ending: story=%s", self._state.story_id)
+            return EngineResult(
+                outcome=EngineOutcome.STORY_ALREADY_ENDED,
+                message="Story has ended. Scan Restart to play again.",
+                story_id=self._state.story_id,
+                new_scene_id=self._state.scene_id,
+                ending_id=self._state.ending_id,
                 inventory=tuple(self._state.inventory.items),
             )
 

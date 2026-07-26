@@ -263,39 +263,63 @@ def test_story_card_ignored_when_story_already_active() -> None:
     assert engine.get_current_scene().id == "forest_path"
 
     result = engine.handle_card(Card(uid="A1", name="Benny", type=CardType.STORY))
-    assert result.outcome == EngineOutcome.STORY_ALREADY_ACTIVE
+    assert result.outcome == EngineOutcome.INVALID_ACTION
     assert engine.get_current_scene().id == "forest_path"
 
 
 @pytest.mark.parametrize(
-    "first_card,second_card,expected_story_id,expected_start_scene",
+    "first_card,second_card,expected_story_id",
     [
-        ("Benny", "Mina", "mina", "school_yard"),
-        ("Benny", "Nova", "nova", "bedroom"),
-        ("Mina", "Benny", "benny", "bunny_home"),
-        ("Mina", "Nova", "nova", "bedroom"),
-        ("Nova", "Mina", "mina", "school_yard"),
+        ("Benny", "Mina", "benny"),
+        ("Benny", "Nova", "benny"),
+        ("Mina", "Benny", "mina"),
+        ("Mina", "Nova", "mina"),
+        ("Nova", "Mina", "nova"),
     ],
 )
-def test_different_story_card_switches_active_story(
+def test_story_card_refused_while_a_story_is_running(
     first_card: str,
     second_card: str,
     expected_story_id: str,
-    expected_start_scene: str,
 ) -> None:
-    """Scanning a different story card must start that story, not keep the first."""
+    """A story card must never switch stories mid-play — progress is protected."""
     loader = StoryLoader(Path(__file__).resolve().parent.parent / "stories")
     engine = StoryEngine(loader)
 
     engine.handle_card(Card(uid="S1", name=first_card, type=CardType.STORY))
-    assert engine.get_state().story_id is not None
+    started_scene = engine.get_current_scene().id
+
+    result = engine.handle_card(Card(uid="S2", name=second_card, type=CardType.STORY))
+    assert result.outcome == EngineOutcome.INVALID_ACTION
+    assert engine.get_state().story_id == expected_story_id
+    assert engine.get_current_scene().id == started_scene
+
+
+@pytest.mark.parametrize(
+    "second_card,expected_story_id,expected_start_scene",
+    [
+        ("Mina", "mina", "school_yard"),
+        ("Nova", "nova", "bedroom"),
+    ],
+)
+def test_different_story_card_starts_that_story_after_an_ending(
+    second_card: str,
+    expected_story_id: str,
+    expected_start_scene: str,
+) -> None:
+    """Once a story has ended, a different story card may start that story."""
+    loader = StoryLoader(Path(__file__).resolve().parent.parent / "stories")
+    engine = StoryEngine(loader)
+
+    engine.handle_card(Card(uid="S1", name="Benny", type=CardType.STORY))
+    for action in ("Key", "Key", "Run", "Talk", "Run", "Run", "Talk",
+                   "Key", "Key", "Open Door", "Run"):
+        engine.handle_card(_action_card(action, uid=f"a-{action}"))
+    assert engine.get_state().is_ended
 
     result = engine.handle_card(Card(uid="S2", name=second_card, type=CardType.STORY))
     assert result.outcome == EngineOutcome.STORY_STARTED
-    assert result.story_id == expected_story_id
-    assert result.story_id != first_card.casefold()
     assert engine.get_state().story_id == expected_story_id
-    assert engine.get_current_scene() is not None
     assert engine.get_current_scene().id == expected_start_scene
 
 
