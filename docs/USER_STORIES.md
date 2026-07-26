@@ -1,4 +1,4 @@
-# User Stories — Tangible NFC Interactive Storybook
+# User Stories — Interactive Storybook
 
 Presentation-ready text. Same structure as the Voice Control example, with
 **Trigger phrase → Trigger action**, because our input is a physical card placed on

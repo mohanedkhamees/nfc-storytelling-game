@@ -412,7 +412,7 @@ def run_registration(
 def build_arg_parser() -> argparse.ArgumentParser:
     """Build the CLI argument parser."""
     parser = argparse.ArgumentParser(
-        description="Register physical NFC cards for the Tangible NFC Interactive Storybook.",
+        description="Register physical NFC cards for the Interactive Storybook.",
     )
     parser.add_argument(
         "--port",

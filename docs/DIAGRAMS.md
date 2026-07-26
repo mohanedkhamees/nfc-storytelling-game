@@ -1,6 +1,6 @@
 # Architecture & Flow Diagrams
 
-Text diagrams for the Tangible NFC Interactive Storybook for Children.
+Text diagrams for the Interactive Storybook for Children.
 
 ---
 

@@ -16,7 +16,7 @@ from pathlib import Path
 from story_loader import Scene, Story, StoryLoadError, StoryLoader
 
 VALID_NFC_ACTIONS = frozenset(
-    {"Sword", "Magic", "Shield", "Run", "Key", "Talk", "Hide", "Open Door", "Restart"}
+    {"Sword", "Magic", "Shield", "Run", "Key", "Talk", "Hide", "Open Door", "Restart", "Home"}
 )
 VALID_ACTION_KEYS = VALID_NFC_ACTIONS
 
@@ -353,7 +353,7 @@ def audit_all_stories(stories_dir: Path = STORIES_DIR) -> list[StoryReport]:
 def main(argv: list[str] | None = None) -> int:
     """Run the audit and return a process exit code."""
     _ = argv
-    print("Tangible NFC Story Audit")
+    print("Interactive Storybook — Story Audit")
     print(f"Stories directory: {STORIES_DIR}")
 
     if not STORIES_DIR.is_dir():

@@ -1,4 +1,4 @@
-"""UID-to-card mapping for the Tangible NFC Interactive Storybook.
+"""UID-to-card mapping for the Interactive Storybook.
 
 Loads card definitions from ``data/cards.json`` and maps raw NFC UIDs
 (from :mod:`serial_reader`) to structured :class:`Card` objects.

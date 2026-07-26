@@ -1,6 +1,6 @@
 # UX Lab — Phase 2 working plan
 
-Deliverables for the second phase of the NUI UX Lab, mapped to our project (Tangible NFC Interactive Storybook).
+Deliverables for the second phase of the NUI UX Lab, mapped to our project (Interactive Storybook).
 
 **Our group is a tangible/touch group** → per the professor's email we **must** do bodystorming with paper prototypes. (The Conversational-UI extra heuristics do *not* apply to us.)
 
@@ -167,7 +167,7 @@ Then draw it as a proper flowchart with a decision diamond ("is this card valid 
 
 Fill the **NN/g workbook** (one Issues + Recommendations box per heuristic) with a friend or family member as evaluator, on the **wireframe/paper prototype** — not on the finished code.
 
-Workbook header: *Evaluator · Date · Product: Tangible NFC Interactive Storybook · Task: "Play Benny's story from start to an ending, then start Mina's story."*
+Workbook header: *Evaluator · Date · Product: Interactive Storybook · Task: "Play Benny's story from start to an ending, then start Mina's story."*
 
 ### Candidate findings (from a code read — treat as hypotheses, confirm or refute with your tester)
 

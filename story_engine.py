@@ -1,4 +1,4 @@
-"""Core story state machine for the Tangible NFC Interactive Storybook.
+"""Core story state machine for the Interactive Storybook.
 
 Manages active story, scene transitions, inventory, and card-driven actions.
 """
@@ -288,6 +288,24 @@ class StoryEngine:
             )
         return self._activate_story(self._story)
 
+    def close_story(self) -> EngineResult:
+        """Unload the active story and return to the story-selection state.
+
+        Used by the Home control on the ending screen. Unlike :meth:`restart`,
+        which replays the same story, this clears the story entirely so any
+        story card can be scanned again.
+
+        Returns:
+            :class:`EngineResult` with :attr:`EngineOutcome.NO_STORY_LOADED`.
+        """
+        logger.info("Story closed: returning to the start screen")
+        self._story = None
+        self._state = GameState()
+        return EngineResult(
+            outcome=EngineOutcome.NO_STORY_LOADED,
+            message="Scan a story card to begin.",
+        )
+
     def is_story_active(self) -> bool:
         """Return whether a story is currently loaded."""
         return self._story is not None and self._state.story_id is not None
@@ -393,9 +411,15 @@ class StoryEngine:
         return None
 
     def _handle_system_card(self, card: Card) -> EngineResult:
-        """Handle system cards such as Restart."""
-        if card.name.lower() == "restart":
+        """Handle system cards such as Restart and Home."""
+        name = card.name.strip().lower()
+        if name == "restart":
             return self.restart()
+        if name == "home":
+            # Works at any point, deliberately: it is the emergency exit a child
+            # needs when they picked the wrong story, which the interface
+            # otherwise lacks entirely.
+            return self.close_story()
 
         return EngineResult(
             outcome=EngineOutcome.INVALID_ACTION,

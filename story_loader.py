@@ -1,4 +1,4 @@
-"""Story JSON ingestion for the Tangible NFC Interactive Storybook.
+"""Story JSON ingestion for the Interactive Storybook.
 
 Loads and validates branching story files from ``stories/`` and exposes
 immutable domain objects (:class:`Story`, :class:`Scene`).

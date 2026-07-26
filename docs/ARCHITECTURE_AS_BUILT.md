@@ -1,4 +1,4 @@
-# Architecture (as built) — Tangible NFC Interactive Storybook
+# Architecture (as built) — Interactive Storybook
 
 **Course:** Natural User Interfaces (HTW, 7th semester)
 **Scope:** Describes the system *as it is actually implemented* in the repository, module by module.

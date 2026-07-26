@@ -46,5 +46,9 @@
   "99999999": {
     "name": "Restart",
     "type": "system"
+  },
+  "AAAAAAAA": {
+    "name": "Home",
+    "type": "system"
   }
 }

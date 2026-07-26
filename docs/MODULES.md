@@ -1,6 +1,6 @@
 # Module Reference
 
-Brief reference for every Python module in the Tangible NFC Interactive Storybook.
+Brief reference for every Python module in the Interactive Storybook.
 
 ---
 

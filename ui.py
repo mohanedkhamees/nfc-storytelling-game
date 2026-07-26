@@ -1,4 +1,4 @@
-"""Tkinter presentation layer for the Tangible NFC Interactive Storybook.
+"""Tkinter presentation layer for the Interactive Storybook.
 
 Display-only GUI with a bright, child-friendly theme. Gameplay input comes
 exclusively from NFC card scans handled by :mod:`main`; this module never
@@ -76,6 +76,9 @@ CARD_STYLES: dict[str, tuple[str, str]] = {
     "Hide": ("🙈", "#7FE0BE"),       # spring
     "Open Door": ("🚪", "#EDA3E8"),  # magenta
     "Restart": ("🔄", "#A3AEF5"),    # blue
+    # Home is deliberately the quietest colour in the deck: it is a session
+    # control, not a story action, so it should not compete with the choices.
+    "Home": ("🏠", "#E8D5C4"),       # warm sand
 }
 
 UNKNOWN_CARD_STYLE: tuple[str, str] = ("🃏", "#E4E4EF")
@@ -308,7 +311,7 @@ class _StartScreen(tk.Frame):
 
         tk.Label(
             header,
-            text="Tangible NFC Interactive Storybook",
+            text="Interactive Storybook",
             font=self._fonts["title"],
             fg=COLOR_TEXT_DARK,
             bg=COLOR_BG,
@@ -406,11 +409,20 @@ class _StorySceneScreen(tk.Frame):
         self._photo: object | None = None
         self._choice_clicks_enabled = choice_clicks_enabled
         self._choice_click_callback: Callable[[str], None] | None = None
+        self._home_callback: Callable[[], None] | None = None
         self._build()
 
     def set_choice_click_callback(self, callback: Callable[[str], None] | None) -> None:
         """Register a callback invoked with the exact choice key when a card is clicked."""
         self._choice_click_callback = callback
+
+    def set_home_callback(self, callback: Callable[[], None] | None) -> None:
+        """Register the callback fired by the Home control."""
+        self._home_callback = callback
+
+    def _trigger_home(self) -> None:
+        if self._home_callback is not None:
+            self._home_callback()
 
     def _build(self) -> None:
         self.columnconfigure(0, weight=1)
@@ -445,6 +457,28 @@ class _StorySceneScreen(tk.Frame):
             anchor=tk.W,
         )
         self._progress_scene_label.grid(row=1, column=0, sticky="ew", pady=(4, 0))
+
+        # Sits in the header, away from the choices, so it reads as navigation
+        # rather than as one of the story options. Coloured like the Home card.
+        home_emoji, home_colour = card_style("Home")
+        self._home_button = tk.Button(
+            progress,
+            text=f"{home_emoji}  Home",
+            font=self._fonts["small"],
+            fg=COLOR_TEXT_DARK,
+            bg=home_colour,
+            activebackground=home_colour,
+            activeforeground=COLOR_TEXT_DARK,
+            relief=tk.FLAT,
+            highlightbackground=COLOR_SURFACE,
+            highlightthickness=2,
+            bd=0,
+            padx=14,
+            pady=6,
+            cursor="hand2",
+            command=self._trigger_home,
+        )
+        self._home_button.grid(row=0, column=1, rowspan=2, sticky="e", padx=(16, 0))
 
         content = tk.Frame(self, bg=COLOR_BG)
         content.grid(row=1, column=0, sticky="nsew", padx=28, pady=8)
@@ -715,7 +749,12 @@ class _EndingScreen(tk.Frame):
         super().__init__(master, bg=COLOR_BG_ALT, **kwargs)
         self._fonts = fonts
         self._photo: object | None = None
+        self._home_callback: Callable[[], None] | None = None
         self._build()
+
+    def set_home_callback(self, callback: Callable[[], None] | None) -> None:
+        """Register the callback fired by the Home control."""
+        self._home_callback = callback
 
     def _build(self) -> None:
         container = tk.Frame(self, bg=COLOR_BG_ALT)
@@ -802,12 +841,38 @@ class _EndingScreen(tk.Frame):
 
         tk.Label(
             side,
-            text="Scan Restart\nto play again! 🔄",
+            text="🔄  Scan Restart to play again\n🏠  Scan Home to pick a new story",
             font=self._fonts["subtitle"],
             fg=COLOR_ACCENT,
             bg=COLOR_BG_ALT,
-            justify=tk.CENTER,
+            justify=tk.LEFT,
         ).pack()
+
+        # Session control, not a gameplay control: it chooses which story to
+        # play, never what happens inside one.
+        home_emoji, home_colour = card_style("Home")
+        self._home_button = tk.Button(
+            side,
+            text=f"{home_emoji}  Home",
+            font=self._fonts["choice_card"],
+            fg=COLOR_TEXT_DARK,
+            bg=home_colour,
+            activebackground=home_colour,
+            activeforeground=COLOR_TEXT_DARK,
+            relief=tk.FLAT,
+            highlightbackground=COLOR_SURFACE,
+            highlightthickness=2,
+            bd=0,
+            padx=18,
+            pady=10,
+            cursor="hand2",
+            command=self._trigger_home,
+        )
+        self._home_button.pack(pady=(18, 0))
+
+    def _trigger_home(self) -> None:
+        if self._home_callback is not None:
+            self._home_callback()
 
     def update_content(
         self,
@@ -941,6 +1006,16 @@ class GameUI:
         """
         self._simulate_callback = callback
 
+    def register_home_callback(self, callback: Callable[[], None]) -> None:
+        """Register the callback fired by the Home control on scene and ending screens.
+
+        Args:
+            callback: Called with no arguments when the player asks to go back
+                to the story-selection screen.
+        """
+        self._scene_screen.set_home_callback(callback)
+        self._ending_screen.set_home_callback(callback)
+
     def register_choice_callback(self, callback: Callable[[str], None]) -> None:
         """Register a callback invoked when a scene choice card is clicked.
 
@@ -1051,7 +1126,7 @@ class GameUI:
         self._error_after_id = self._root.after(ERROR_DISPLAY_MS, restore)
 
     def _configure_root(self) -> None:
-        self._root.title("Tangible NFC Interactive Storybook")
+        self._root.title("Interactive Storybook")
         self._root.configure(bg=COLOR_BG)
         """self._root.minsize(MIN_WIDTH, MIN_HEIGHT)"""
         self._root.attributes("-fullscreen", True)
@@ -1138,7 +1213,7 @@ class GameUI:
         """Build compact developer tools for simulated card scans."""
         panel = tk.LabelFrame(
             self._root,
-            text="Debug — simulate scan (keys 1–9, 0, -, =)",
+            text="Debug — simulate scan (keys 1–9, 0, -, =, h)",
             font=self._fonts["debug_label"],
             fg=COLOR_MUTED,
             bg=COLOR_BG,
@@ -1159,9 +1234,10 @@ class GameUI:
             "Hide",
             "Open Door",
             "Restart",
+            "Home",
         ]
         self._debug_cards = debug_cards
-        key_labels = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="]
+        key_labels = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "h"]
 
         buttons_frame = tk.Frame(panel, bg=COLOR_BG)
         buttons_frame.pack(fill=tk.X, padx=6, pady=(4, 2))
@@ -1199,6 +1275,7 @@ class GameUI:
             "0": 9,
             "minus": 10,
             "equal": 11,
+            "h": 12,
         }
         for key, card_index in key_bindings.items():
             self._root.bind(

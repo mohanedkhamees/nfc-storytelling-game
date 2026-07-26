@@ -1,5 +1,5 @@
 /*
- * Tangible NFC Interactive Storytelling Game
+ * Interactive Storybook
  * Step 3: Arduino RC522 UID Reader Firmware
  *
  * Reads NFC card UIDs and sends them over USB serial to the Python host.

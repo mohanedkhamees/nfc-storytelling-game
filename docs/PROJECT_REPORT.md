@@ -1,4 +1,4 @@
-# Project Report — Tangible NFC Interactive Storybook for Children
+# Project Report — Interactive Storybook for Children
 
 **Course:** Natural User Interfaces (NUI)  
 **Project:** Offline tangible-interaction storytelling game  

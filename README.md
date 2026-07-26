@@ -1,4 +1,4 @@
-# Tangible NFC Interactive Storybook for Children
+# Interactive Storybook for Children
 
 A university Natural User Interfaces (NUI) project that combines **physical NFC cards**, **Arduino hardware**, and **interactive branching storytelling**. Players advance offline stories by scanning tangible cards — not by clicking GUI buttons.
 
@@ -477,4 +477,4 @@ python3 register_cards.py --help
 
 ---
 
-*Natural User Interfaces — Tangible NFC Interactive Storybook for Children*
+*Natural User Interfaces — Interactive Storybook for Children*

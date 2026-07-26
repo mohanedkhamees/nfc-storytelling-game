@@ -1,4 +1,4 @@
-# Architecture — Tangible NFC Interactive Storybook for Children
+# Architecture — Interactive Storybook for Children
 
 **Course:** Natural User Interfaces (NUI)  
 **Version:** Step 2 — Architecture Design  

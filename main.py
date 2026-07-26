@@ -1,4 +1,4 @@
-"""Application composition root for the Tangible NFC Interactive Storybook.
+"""Application composition root for the Interactive Storybook.
 
 Wires serial I/O, card mapping, story engine, and Tkinter UI. All gameplay
 logic stays in :mod:`story_engine`; this module only orchestrates callbacks
@@ -38,6 +38,7 @@ CLI_SUPPORTED_CARDS = [
     "Hide",
     "Open Door",
     "Restart",
+    "Home",
 ]
 
 LOG_FORMAT = "%(asctime)s %(levelname)s %(name)s: %(message)s"
@@ -199,7 +200,7 @@ def _log_engine_result(result: EngineResult, last_inventory: tuple[str, ...]) ->
 
 
 def _print_cli_start_screen(story_names: list[str]) -> None:
-    print("\n=== Tangible NFC Interactive Storybook (CLI) ===")
+    print("\n=== Interactive Storybook (CLI) ===")
     print("Scan a Story Card to begin.\n")
     print("Available stories:")
     for name in story_names:
@@ -351,7 +352,7 @@ def _apply_cli_engine_result(
 def run_cli(*, debug: bool = False, input_fn=input) -> None:
     """Run the game in terminal mode without Tkinter or Arduino."""
     configure_logging(debug=debug)
-    logger.info("Starting Tangible NFC Interactive Storybook (CLI mode, debug=%s)", debug)
+    logger.info("Starting Interactive Storybook (CLI mode, debug=%s)", debug)
 
     card_manager, cards_error = init_card_manager()
     story_loader, _, story_error = init_story_loader()
@@ -433,7 +434,7 @@ class GameApplication:
         logger.info("Tkinter root window created successfully")
 
         logger.info(
-            "Starting Tangible NFC Interactive Storybook (hardware=%s, debug=%s)",
+            "Starting Interactive Storybook (hardware=%s, debug=%s)",
             self._hardware_mode,
             debug,
         )
@@ -454,6 +455,10 @@ class GameApplication:
             story_entries=story_entries,
             asset_manager=self._asset_manager,
         )
+        # Available in both modes: it only chooses which story to play, so it
+        # does not give the player a way to bypass the cards during a story.
+        self._ui.register_home_callback(self._on_home_clicked)
+
         if debug:
             self._ui.register_simulate_callback(self._simulate_card_by_name)
             self._ui.register_choice_callback(self._on_choice_clicked)
@@ -579,6 +584,13 @@ class GameApplication:
         self._log_active_scene_choices(source=source, action_key=card.name)
         result = self._story_engine.handle_card(card)
         self._apply_engine_result(result)
+
+    def _on_home_clicked(self) -> None:
+        """Ending-screen Home control: unload the story and show the start screen."""
+        logger.info("Home requested from the ending screen")
+        result = self._story_engine.close_story()
+        self._apply_engine_result(result)
+        self._ui.set_status("Scan a story card to begin.")
 
     def _on_choice_clicked(self, choice_key: str) -> None:
         """Debug helper: simulate scanning the NFC card matching a scene choice key."""
@@ -736,7 +748,7 @@ def run_gui(*, hardware_mode: bool, debug: bool, port: str | None = None) -> Non
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     """Parse CLI arguments for hardware vs debug vs terminal operation."""
     parser = argparse.ArgumentParser(
-        description="Tangible NFC Interactive Storybook for Children",
+        description="Interactive Storybook for Children",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "Examples:\n"
