@@ -165,6 +165,31 @@ def _text_pixel_height(widget: tk.Text) -> int | None:
     return int(measured) if measured is not None else None
 
 
+def _wrapped_pixel_height(font: tkfont.Font, text: str, width: int) -> int:
+    """Height in pixels *text* would need when word-wrapped to *width*.
+
+    Measured with a detached font object rather than by configuring the widget,
+    so choosing a size costs no layout passes and produces no visible flicker.
+    """
+    line_height = font.metrics("linespace")
+    lines = 0
+    for paragraph in text.split("\n"):
+        words = paragraph.split()
+        if not words:
+            lines += 1
+            continue
+        current = words[0]
+        lines += 1
+        for word in words[1:]:
+            candidate = f"{current} {word}"
+            if font.measure(candidate) <= width:
+                current = candidate
+            else:
+                lines += 1
+                current = word
+    return lines * line_height
+
+
 def _fit_text_font(
     widget: tk.Text,
     family: str,
@@ -175,13 +200,18 @@ def _fit_text_font(
 ) -> None:
     """Shrink *widget*'s font until its text fits, so it never needs scrolling.
 
+    The size is chosen by measuring detached font objects, then applied in a
+    single ``configure`` call. Trying sizes on the widget itself would repaint
+    it once per candidate, which reads as the scene flickering when it changes.
+
     The widget must be stretched by its geometry manager (its own ``height``
     request is ignored), otherwise the available height would shrink along with
-    the font and the loop would never converge.
+    the font and no size would ever fit.
     """
     widget.update_idletasks()
-    available = widget.winfo_height()
-    if available <= 1:
+    available_h = widget.winfo_height()
+    available_w = widget.winfo_width()
+    if available_h <= 1 or available_w <= 1:
         # Not laid out yet — retry a few times, then give up quietly.
         if _attempt < 10:
             widget.after(
@@ -196,12 +226,23 @@ def _fit_text_font(
             )
         return
 
+    text = widget.get("1.0", "end-1c")
+    try:
+        padding = int(str(widget.cget("padx"))) * 2 + 10
+    except (ValueError, tk.TclError):
+        padding = 22
+    usable_w = max(60, available_w - padding)
+
+    chosen = min_size
     for size in range(max_size, min_size - 1, -1):
-        widget.configure(font=(family, size))
-        widget.update_idletasks()
-        needed = _text_pixel_height(widget)
-        if needed is None or needed <= available:
-            return
+        probe = tkfont.Font(family=family, size=size)
+        fits = _wrapped_pixel_height(probe, text, usable_w) <= available_h
+        del probe
+        if fits:
+            chosen = size
+            break
+
+    widget.configure(font=(family, chosen))
 
 
 def _rounded_frame(
@@ -629,12 +670,16 @@ class _StorySceneScreen(tk.Frame):
             ).pack(pady=(4, 0))
 
             if self._choice_clicks_enabled and self._choice_click_callback is not None:
+
+                def _on_click(_event: object, key: str = choice_key) -> str:
+                    if self._choice_click_callback is not None:
+                        self._choice_click_callback(key)
+                    # Stop here so the click cannot also reach another handler.
+                    return "break"
+
                 for widget in (card, *card.winfo_children()):
                     widget.configure(cursor="hand2")
-                    widget.bind(
-                        "<Button-1>",
-                        lambda _event, key=choice_key: self._choice_click_callback(key),
-                    )
+                    widget.bind("<Button-1>", _on_click)
 
     def _render_inventory(self, inventory: list[str]) -> None:
         if inventory:
@@ -647,9 +692,9 @@ class _StorySceneScreen(tk.Frame):
             self._photo = None
             self._image_label.config(image="", text="🖼️")
             return
-        self._image_label.config(image="", text="Loading…")
 
-        self._image_label.update_idletasks()
+        # Load first, then swap in one configure call. Blanking the label and
+        # forcing a repaint beforehand made every scene change flash twice.
         self._photo = asset_manager.load_image(
             image_path,
             (IMAGE_MAX_WIDTH, IMAGE_MAX_HEIGHT),
