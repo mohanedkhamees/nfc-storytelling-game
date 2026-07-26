@@ -223,6 +223,9 @@ class StoryEngine:
             )
 
         if self._state.is_ended:
+            if card.type == CardType.SYSTEM:
+                return self._handle_system_card(card)
+
             return EngineResult(
                 outcome=EngineOutcome.STORY_ALREADY_ENDED,
                 message="Story has ended. Scan Restart or a story card.",
@@ -284,7 +287,10 @@ class StoryEngine:
                 message="No story is active to restart.",
             )
         return self._activate_story(self._story)
-
+    def exit_story(self) -> None:
+        """Exit the current story and return to the start screen."""
+        self._story = None
+        self._state = GameState()
     def is_story_active(self) -> bool:
         """Return whether a story is currently loaded."""
         return self._story is not None and self._state.story_id is not None
@@ -310,9 +316,9 @@ class StoryEngine:
         ):
             logger.info(
                 "Story card ignored: story=%s scene=%s card=%r",
-                self._state.story_id,
+               """ self._state.story_id,
                 self._state.scene_id,
-                card.name,
+                card.name,"""
             )
             return EngineResult(
                 outcome=EngineOutcome.STORY_ALREADY_ACTIVE,

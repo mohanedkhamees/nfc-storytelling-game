@@ -409,7 +409,7 @@
       "id": "mountain_tower",
       "title": "The Mountain Tower",
       "text": "An old stone tower stands on the hill. Green vines cover the walls. The crystal shines behind a locked door. Benny needs a key. Or he needs the vines to lift him up. Far below, the river shines in the sun.",
-      "image": "assets/images/benny/benny-pushes-door.png",
+      "image": "assets/images/fantasy/benny/tower.png",
       "choices": {
         "Key": "tower_gate",
         "Open Door": "locked_tower_fail",
