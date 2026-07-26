@@ -1,0 +1,45 @@
+flowchart LR
+    forest_path["The Whispering Forest"]
+    squirrel_help["Sammy the Squirrel<br/>➕ Apple"]
+    cut_thorns["Careful Paws<br/>➕ Apple"]
+    ignore_squirrel["A Quiet Mistake"]
+    wise_tree["The Wise Tree"]
+    glowing_mushrooms["The Mushroom Circle"]
+    broken_bridge["③ The Broken Bridge"]
+    bunny_home["① Benny's Morning"]
+    fox_meeting["④ Fina the Fox"]
+    golden_key["① The Golden Key"]
+    grandma_rabbit["① Grandma's Advice"]
+    locked_box["① The Little Box"]
+    take_leaf_shield["① The Leaf Shield"]
+
+    bunny_home -->|"🏃 Run"| forest_path
+    grandma_rabbit -->|"✨ Magic"| wise_tree
+    grandma_rabbit -.->|"🏃 Run"| forest_path
+    locked_box -.->|"🏃 Run"| forest_path
+    golden_key -.->|"🏃 Run"| forest_path
+    take_leaf_shield -.->|"✨ Magic"| wise_tree
+    take_leaf_shield -.->|"🏃 Run"| forest_path
+    forest_path -->|"🙈 Hide"| ignore_squirrel
+    forest_path -->|"⚔️ Sword"| cut_thorns
+    forest_path -->|"💬 Talk"| squirrel_help
+    squirrel_help -.->|"✨ Magic"| wise_tree
+    squirrel_help -->|"🏃 Run"| broken_bridge
+    cut_thorns -->|"🏃 Run"| broken_bridge
+    cut_thorns -.->|"💬 Talk"| squirrel_help
+    ignore_squirrel -->|"🏃 Run"| broken_bridge
+    ignore_squirrel -.->|"💬 Talk"| squirrel_help
+    wise_tree -->|"✨ Magic"| glowing_mushrooms
+    wise_tree -->|"🏃 Run"| broken_bridge
+    glowing_mushrooms -.->|"🏃 Run"| broken_bridge
+    glowing_mushrooms -->|"💬 Talk"| fox_meeting
+
+    classDef scene fill:#FFFFFF,stroke:#8496A6,stroke-width:1.5px,color:#1B2733
+    classDef ghost fill:#EDF2F7,stroke:#A9BACB,stroke-width:1px,stroke-dasharray:4 3,color:#5D6E7E
+    classDef start fill:#FFE785,stroke:#C9A227,stroke-width:3px,color:#1A1A2E
+    classDef ending fill:#8FE39A,stroke:#3C9A50,stroke-width:3px,color:#1A1A2E
+    classDef gate fill:#FFA8A8,stroke:#C25454,stroke-width:2px,color:#1A1A2E
+    classDef giver fill:#C6E86B,stroke:#7FA32E,stroke-width:2px,color:#1A1A2E
+    class forest_path,ignore_squirrel,wise_tree,glowing_mushrooms scene
+    class broken_bridge,bunny_home,fox_meeting,golden_key,grandma_rabbit,locked_box,take_leaf_shield ghost
+    class squirrel_help,cut_thorns giver

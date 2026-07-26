@@ -1,0 +1,112 @@
+flowchart LR
+    subgraph act0["Step 0"]
+        direction TB
+        bedroom["A Light at the Window"]
+    end
+    subgraph act1["Step 1"]
+        direction TB
+        backyard["The Backyard Launch Pad"]
+        rocket_key["The Rocket Key<br/>➕ Rocket Key"]
+        star_friend["Stella the Star<br/>➕ Stella"]
+    end
+    subgraph act2["Step 2"]
+        direction TB
+        neighbor_roof["The Neighbor’s Roof"]
+        rocket_pad["The Rocket Door"]
+        starlight_map["The Starlight Map<br/>➕ Starlight Map"]
+    end
+    subgraph act3["Step 3"]
+        direction TB
+        launch["Lift Off!"]
+        robot_signal["Robo-Bip’s Signal<br/>➕ Robo-Bip Signal"]
+        safety_check["Safety First<br/>➕ Safety Check"]
+    end
+    subgraph act4["Step 4"]
+        direction TB
+        comet_bridge["The Comet Bridge"]
+        control_panel["The Blinking Button<br/>➕ Navigation Fixed"]
+        find_battery["The Spare Battery<br/>➕ Battery, Robo-Bip"]
+        moon_station["Moon Station"]
+    end
+    subgraph act5["Step 5"]
+        direction TB
+        fix_telescope["Fixing the Telescope"]
+        meteor_mist["Meteor Mist"]
+        moon_rabbits["Moon Rabbits<br/>➕ Moon Carrot"]
+        planet_colors["The Planet of Colors"]
+        slow_crossing["Slow and Steady<br/>➕ Comet Dust"]
+    end
+    subgraph act6["Step 6"]
+        direction TB
+        color_creatures["The Color Creatures<br/>🔒 needs Moon Carrot<br/>➕ Rainbow Friend"]
+        color_song["The Friendly Song<br/>➕ Friendly Song"]
+        sky_gate["The Sky Garden Gate"]
+    end
+    subgraph act7["Step 7"]
+        direction TB
+        bright_space_ending(["Bright Ending"])
+        golden_space_ending(["Golden Ending<br/>🔒 needs Friendly Song"])
+        soft_space_ending(["Soft Ending"])
+    end
+
+    bedroom -->|"🗝️ Key"| rocket_key
+    bedroom -->|"🏃 Run"| backyard
+    bedroom -->|"💬 Talk"| star_friend
+    star_friend -->|"✨ Magic"| starlight_map
+    star_friend -->|"🏃 Run"| rocket_pad
+    rocket_key -->|"🏃 Run"| rocket_pad
+    rocket_key -.->|"💬 Talk"| star_friend
+    backyard -->|"🗝️ Key"| rocket_pad
+    backyard -->|"✨ Magic"| starlight_map
+    backyard -->|"🏃 Run"| neighbor_roof
+    starlight_map -.->|"🏃 Run"| rocket_pad
+    starlight_map -.->|"💬 Talk"| star_friend
+    neighbor_roof -.->|"🏃 Run"| rocket_pad
+    neighbor_roof -->|"💬 Talk"| robot_signal
+    robot_signal -.->|"🏃 Run"| rocket_pad
+    robot_signal -->|"🛡️ Shield"| find_battery
+    find_battery -.->|"🏃 Run"| rocket_pad
+    rocket_pad -->|"🗝️ Key"| launch
+    rocket_pad -->|"✨ Magic"| launch
+    rocket_pad -->|"💬 Talk"| safety_check
+    safety_check -.->|"🚪 Open Door"| launch
+    safety_check -.->|"🏃 Run"| launch
+    launch -->|"🏃 Run"| comet_bridge
+    launch -->|"🛡️ Shield"| moon_station
+    launch -->|"💬 Talk"| control_panel
+    control_panel -.->|"✨ Magic"| comet_bridge
+    control_panel -.->|"💬 Talk"| moon_station
+    moon_station -->|"🗝️ Key"| fix_telescope
+    moon_station -.->|"🏃 Run"| comet_bridge
+    moon_station -->|"💬 Talk"| moon_rabbits
+    moon_rabbits -.->|"🗝️ Key"| fix_telescope
+    moon_rabbits -.->|"🏃 Run"| comet_bridge
+    fix_telescope -.->|"✨ Magic"| planet_colors
+    fix_telescope -.->|"🏃 Run"| comet_bridge
+    comet_bridge -->|"✨ Magic"| planet_colors
+    comet_bridge -->|"🏃 Run"| meteor_mist
+    comet_bridge -->|"🛡️ Shield"| slow_crossing
+    slow_crossing -.->|"🏃 Run"| planet_colors
+    meteor_mist -.->|"🏃 Run"| planet_colors
+    meteor_mist -->|"💬 Talk"| color_creatures
+    planet_colors -->|"✨ Magic"| color_song
+    planet_colors -->|"🏃 Run"| sky_gate
+    planet_colors -->|"💬 Talk"| color_creatures
+    color_creatures -.->|"✨ Magic"| color_song
+    color_creatures -.->|"🏃 Run"| sky_gate
+    color_song -.->|"🚪 Open Door"| sky_gate
+    color_song -.->|"🏃 Run"| sky_gate
+    sky_gate -->|"✨ Magic"| bright_space_ending
+    sky_gate -->|"🚪 Open Door"| golden_space_ending
+    sky_gate -->|"🏃 Run"| soft_space_ending
+
+    classDef scene fill:#FFFFFF,stroke:#8496A6,stroke-width:1.5px,color:#1B2733
+    class backyard,neighbor_roof,rocket_pad,launch,moon_station,fix_telescope,comet_bridge,meteor_mist,planet_colors,sky_gate scene
+    classDef start fill:#FFE785,stroke:#C9A227,stroke-width:3px,color:#1A1A2E
+    classDef ending fill:#8FE39A,stroke:#3C9A50,stroke-width:3px,color:#1A1A2E
+    classDef gate fill:#FFA8A8,stroke:#C25454,stroke-width:2px,color:#1A1A2E
+    classDef giver fill:#C6E86B,stroke:#7FA32E,stroke-width:2px,color:#1A1A2E
+    class bedroom start
+    class bright_space_ending,golden_space_ending,soft_space_ending ending
+    class color_creatures,golden_space_ending gate
+    class rocket_key,star_friend,starlight_map,robot_signal,safety_check,control_panel,find_battery,moon_rabbits,slow_crossing,color_song giver

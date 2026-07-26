@@ -572,11 +572,10 @@ class GameApplication:
 
     def _handle_card_scan(self, card: Card, *, source: str) -> None:
         self._ui.set_last_scanned(card.name, card.uid)
-        if card.type == CardType.STORY and self._story_engine.is_story_active():
-            self._ui.show_error("Story cards can only be used at the start.")
-            logger.info("Ignored story card during active story: %s", card.name)
-            return
-
+        # Story cards are not blocked here: StoryEngine already ignores a re-scan
+        # of the story in progress (STORY_ALREADY_ACTIVE) while still allowing a
+        # different story to be started, and a story card to be used after an
+        # ending. Blocking them here also broke Restart on the ending screen.
         self._log_active_scene_choices(source=source, action_key=card.name)
         result = self._story_engine.handle_card(card)
         self._apply_engine_result(result)
