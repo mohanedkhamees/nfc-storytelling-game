@@ -8,6 +8,7 @@ Use ``--cli`` to run a terminal REPL without importing Tkinter (macOS-safe).
 """
 
 from __future__ import annotations
+import traceback
 
 import argparse
 import logging
@@ -15,7 +16,7 @@ import sys
 from pathlib import Path
 
 from card_manager import Card, CardManager, CardType
-from story_engine import STORY_CARD_TO_ID, EngineOutcome, EngineResult, StoryEngine
+from story_engine import STORY_CARD_TO_ID, EngineOutcome, EngineResult, StoryEngine, GameState
 from story_loader import StoryLoadError, StoryLoader
 
 logger = logging.getLogger(__name__)
@@ -427,6 +428,7 @@ class GameApplication:
         self._debug = debug
         self._serial_reader: SerialReader | None = None
         self._last_inventory: tuple[str, ...] = ()
+        
 
         logger.info("Creating Tkinter root window...")
         self._root = tk.Tk()
@@ -456,6 +458,7 @@ class GameApplication:
         )
         if debug:
             self._ui.register_simulate_callback(self._simulate_card_by_name)
+            self._ui.register_home_callback(self._go_home)
             self._ui.register_choice_callback(self._on_choice_clicked)
 
         if self._cards_load_error:
@@ -572,7 +575,8 @@ class GameApplication:
 
     def _handle_card_scan(self, card: Card, *, source: str) -> None:
         self._ui.set_last_scanned(card.name, card.uid)
-        if card.type == CardType.STORY and self._story_engine.is_story_active():
+        state = self._story_engine.get_state()
+        if (card.type == CardType.STORY and self._story_engine.is_story_active() and not state.is_ended):
             self._ui.show_error("Story cards can only be used at the start.")
             logger.info("Ignored story card during active story: %s", card.name)
             return
@@ -608,6 +612,9 @@ class GameApplication:
 
     def _simulate_card_by_name(self, card_name: str) -> None:
         """Debug helper: simulate a scan by card name."""
+
+        print("========== SIMULATE CALLED ==========")
+        traceback.print_stack(limit=8)
         card = find_card_by_name(self._card_manager, card_name)
         if card is None:
             logger.warning("Debug simulate: unknown card name %r", card_name)
@@ -704,6 +711,15 @@ class GameApplication:
             scene=scene,
             ending_id=state.ending_id,
         )
+    def _go_home(self) -> None:
+        """Return to the main menu from any story."""
+
+        self._story_engine._story = None
+        self._story_engine._state = GameState()
+
+        self._last_inventory = ()
+
+        self._ui.show_start_screen()
 
     def _on_close(self) -> None:
         """Clean shutdown: stop serial thread and destroy the window."""

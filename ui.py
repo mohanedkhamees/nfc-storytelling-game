@@ -864,6 +864,8 @@ class GameUI:
         """
         self._root = root
         self._assets_dir = Path(assets_dir)
+        self._home_callback: Callable[[], None] | None = None,
+
         if asset_manager is not None:
             self._asset_manager = asset_manager
         else:
@@ -904,6 +906,9 @@ class GameUI:
         """
         self._choice_click_callback = callback
         self._scene_screen.set_choice_click_callback(callback)
+    def register_home_callback(self, callback: Callable[[], None]) -> None:
+        """Register callback for the Home button."""
+        self._home_callback = callback
 
     def show_start_screen(self) -> None:
         """Show the welcome screen listing available story cards."""
@@ -1028,7 +1033,15 @@ class GameUI:
         self._screen_container.grid(row=0, column=0, sticky="nsew")
         self._screen_container.rowconfigure(0, weight=1)
         self._screen_container.columnconfigure(0, weight=1)
-
+        self._home_button = tk.Button(
+            self._screen_container,
+            text="🏠 Home",
+            font=self._fonts["small"],
+            bg=PASTEL_GREEN,
+            relief=tk.FLAT,
+            cursor="hand2",
+            command=lambda: self._home_callback() if self._home_callback else None,
+        )
         self._start_screen = _StartScreen(
             self._screen_container,
             story_entries=self._story_entries,
@@ -1155,12 +1168,13 @@ class GameUI:
             "minus": 10,
             "equal": 11,
         }
+        """
         for key, card_index in key_bindings.items():
             self._root.bind(
                 f"<{key}>",
                 lambda _event, idx=card_index: self._trigger_simulate(debug_cards[idx]),
             )
-
+        """
         entry_frame = tk.Frame(panel, bg=COLOR_BG)
         entry_frame.pack(fill=tk.X, padx=6, pady=(0, 4))
 
@@ -1213,3 +1227,13 @@ class GameUI:
 
     def _show_frame(self, frame: tk.Frame) -> None:
         frame.tkraise()
+
+        if frame is self._start_screen:
+            self._home_button.place_forget()
+        else:
+            self._home_button.place(
+                relx=0.98,
+                rely=0.02,
+                anchor="ne",
+            )
+            self._home_button.lift()
