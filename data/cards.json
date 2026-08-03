@@ -1,53 +1,53 @@
 {
-  "831E4930": {
+  "53733230": {
     "name": "Benny",
     "type": "story"
   },
-  "B3133334": {
+  "23E35134": {
     "name": "Mina",
     "type": "story"
   },
-  "C1D2E3F4": {
+  "934D9D35": {
     "name": "Nova",
     "type": "story"
   },
-  "11111111": {
+  "B380B034": {
     "name": "Sword",
     "type": "action"
   },
-  "22222222": {
+  "A3531C34": {
     "name": "Magic",
     "type": "action"
   },
-  "33333333": {
+  "831E4930": {
     "name": "Shield",
     "type": "action"
   },
-  "A3531C34": {
+  "B3133334": {
     "name": "Run",
     "type": "action"
   },
-  "55555555": {
+  "A3B82330": {
     "name": "Key",
     "type": "item"
   },
-  "66666666": {
+  "A3BC9F34": {
     "name": "Talk",
     "type": "action"
   },
-  "77777777": {
+  "43D51B34": {
     "name": "Hide",
     "type": "action"
   },
-  "88888888": {
+  "43337735": {
     "name": "Open Door",
     "type": "action"
   },
-  "99999999": {
+  "13A68E35": {
     "name": "Restart",
     "type": "system"
   },
-  "AAAAAAAA": {
+  "337A4534": {
     "name": "Home",
     "type": "system"
   }
